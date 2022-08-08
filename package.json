@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && cap sync",
     "lint": "vue-cli-service lint",
     "prepare": "husky install",
     "serve": "vue-cli-service serve",
@@ -14,9 +14,11 @@
     "test:e2e": "vue-cli-service test:e2e"
   },
   "dependencies": {
+    "@capacitor/android": "4.0.1",
     "@capacitor/app": "^4.0.1",
     "@capacitor/core": "^4.0.1",
     "@capacitor/haptics": "^4.0.1",
+    "@capacitor/ios": "4.0.1",
     "@capacitor/keyboard": "^4.0.1",
     "@capacitor/status-bar": "^4.0.1",
     "@ionic/vue": "^6.0.0",
