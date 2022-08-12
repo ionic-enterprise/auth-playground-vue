@@ -1,5 +1,6 @@
 import AppPinDialog from '@/components/AppPinDialog.vue';
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { modalController } from '@ionic/vue';
+import { mount, VueWrapper } from '@vue/test-utils';
 
 describe('AppPinDialog', () => {
   const createComponent = (setPasscodeMode = false): VueWrapper<any> => {
@@ -30,29 +31,22 @@ describe('AppPinDialog', () => {
     it('adds markers for each button press, stopping after nine', async () => {
       const pin = wrapper.find('[data-testid="display-pin"]');
       const buttons = wrapper.findAll('[data-testclass="number-button"]');
-      buttons[0].trigger('click');
-      await flushPromises();
+      await buttons[0].trigger('click');
       expect(pin.text()).toEqual('*');
-      buttons[3].trigger('click');
-      await flushPromises();
+      await buttons[3].trigger('click');
       expect(pin.text()).toEqual('**');
-      buttons[1].trigger('click');
-      await flushPromises();
+      await buttons[1].trigger('click');
       expect(pin.text()).toEqual('***');
-      buttons[8].trigger('click');
-      await flushPromises();
+      await buttons[8].trigger('click');
       expect(pin.text()).toEqual('****');
       for (let x = 0; x < 4; x++) {
-        buttons[6].trigger('click');
-        await flushPromises();
+        await buttons[6].trigger('click');
       }
       expect(pin.text()).toEqual('********');
-      buttons[9].trigger('click');
-      await flushPromises();
+      await buttons[9].trigger('click');
       expect(pin.text()).toEqual('*********');
       for (let x = 0; x < 4; x++) {
-        buttons[3].trigger('click');
-        await flushPromises();
+        await buttons[3].trigger('click');
         expect(pin.text()).toEqual('*********');
       }
     });
@@ -63,13 +57,19 @@ describe('AppPinDialog', () => {
         const deleteButton = wrapper.find('[data-testid="delete-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');
         for (let x = 0; x < 4; x++) {
-          buttons[6].trigger('click');
-          await flushPromises();
+          await buttons[6].trigger('click');
         }
         expect(pin.text()).toEqual('****');
-        deleteButton.trigger('click');
-        await flushPromises();
+        await deleteButton.trigger('click');
         expect(pin.text()).toEqual('***');
+      });
+    });
+
+    describe('cancel button', () => {
+      it('does not exist', async () => {
+        modalController.dismiss = jest.fn();
+        const cancel = wrapper.find('[data-testid="cancel-button"]');
+        expect(cancel.exists()).toBe(false);
       });
     });
 
@@ -79,19 +79,54 @@ describe('AppPinDialog', () => {
         const enterButton = wrapper.find('[data-testid="enter-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');
         const prompt = wrapper.find('[data-testid="prompt"]');
-        buttons[0].trigger('click');
-        await flushPromises();
-        buttons[3].trigger('click');
-        await flushPromises();
-        buttons[1].trigger('click');
-        await flushPromises();
-        buttons[8].trigger('click');
-        await flushPromises();
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[1].trigger('click');
+        await buttons[8].trigger('click');
         expect(pin.text()).toEqual('****');
-        enterButton.trigger('click');
-        await flushPromises();
+        await enterButton.trigger('click');
         expect(pin.text()).toEqual('');
         expect(prompt.text()).toEqual('Verify PIN');
+      });
+
+      it('dismissing when entered PINs match', async () => {
+        modalController.dismiss = jest.fn();
+        const enterButton = wrapper.find('[data-testid="enter-button"]');
+        const buttons = wrapper.findAll('[data-testclass="number-button"]');
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[1].trigger('click');
+        await buttons[8].trigger('click');
+        await enterButton.trigger('click');
+        expect(modalController.dismiss).not.toHaveBeenCalled();
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[1].trigger('click');
+        await buttons[8].trigger('click');
+        await enterButton.trigger('click');
+        expect(modalController.dismiss).toHaveBeenCalledTimes(1);
+        expect(modalController.dismiss).toHaveBeenCalledWith('1429');
+      });
+
+      it('provides an error when the PINs do not match', async () => {
+        modalController.dismiss = jest.fn();
+        const enterButton = wrapper.find('[data-testid="enter-button"]');
+        const buttons = wrapper.findAll('[data-testclass="number-button"]');
+        const errorMsg = wrapper.find('[data-testid="error-message"]');
+        const prompt = wrapper.find('[data-testid="prompt"]');
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[1].trigger('click');
+        await buttons[8].trigger('click');
+        await enterButton.trigger('click');
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[2].trigger('click');
+        await buttons[8].trigger('click');
+        await enterButton.trigger('click');
+        expect(modalController.dismiss).not.toHaveBeenCalled();
+        expect(errorMsg.text()).toBe('PINs do not match');
+        expect(prompt.text()).toBe('Create Session PIN');
       });
     });
   });
@@ -115,29 +150,22 @@ describe('AppPinDialog', () => {
     it('adds markers for each button press, stopping after nine', async () => {
       const pin = wrapper.find('[data-testid="display-pin"]');
       const buttons = wrapper.findAll('[data-testclass="number-button"]');
-      buttons[0].trigger('click');
-      await flushPromises();
+      await buttons[0].trigger('click');
       expect(pin.text()).toEqual('*');
-      buttons[3].trigger('click');
-      await flushPromises();
+      await buttons[3].trigger('click');
       expect(pin.text()).toEqual('**');
-      buttons[1].trigger('click');
-      await flushPromises();
+      await buttons[1].trigger('click');
       expect(pin.text()).toEqual('***');
-      buttons[8].trigger('click');
-      await flushPromises();
+      await buttons[8].trigger('click');
       expect(pin.text()).toEqual('****');
       for (let x = 0; x < 4; x++) {
-        buttons[6].trigger('click');
-        await flushPromises();
+        await buttons[6].trigger('click');
       }
       expect(pin.text()).toEqual('********');
-      buttons[9].trigger('click');
-      await flushPromises();
+      await buttons[9].trigger('click');
       expect(pin.text()).toEqual('*********');
       for (let x = 0; x < 4; x++) {
-        buttons[3].trigger('click');
-        await flushPromises();
+        await buttons[3].trigger('click');
         expect(pin.text()).toEqual('*********');
       }
     });
@@ -148,13 +176,51 @@ describe('AppPinDialog', () => {
         const deleteButton = wrapper.find('[data-testid="delete-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');
         for (let x = 0; x < 4; x++) {
-          buttons[6].trigger('click');
-          await flushPromises();
+          await buttons[6].trigger('click');
         }
         expect(pin.text()).toEqual('****');
-        deleteButton.trigger('click');
-        await flushPromises();
+        await deleteButton.trigger('click');
         expect(pin.text()).toEqual('***');
+      });
+    });
+
+    describe('presssing the cancel button', () => {
+      it('closes the modal', async () => {
+        modalController.dismiss = jest.fn();
+        const cancel = wrapper.find('[data-testid="cancel-button"]');
+        await cancel.trigger('click');
+        expect(modalController.dismiss).toHaveBeenCalledTimes(1);
+        expect(modalController.dismiss).toHaveBeenCalledWith(undefined, 'cancel');
+      });
+
+      it('ignores entered data', async () => {
+        modalController.dismiss = jest.fn();
+        const cancel = wrapper.find('[data-testid="cancel-button"]');
+        const buttons = wrapper.findAll('[data-testclass="number-button"]');
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[1].trigger('click');
+        await buttons[8].trigger('click');
+        await cancel.trigger('click');
+        expect(modalController.dismiss).toHaveBeenCalledTimes(1);
+        expect(modalController.dismiss).toHaveBeenCalledWith(undefined, 'cancel');
+      });
+    });
+
+    describe('pressing enter', () => {
+      it('closes the modal passing back the pin', async () => {
+        modalController.dismiss = jest.fn();
+        const pin = wrapper.find('[data-testid="display-pin"]');
+        const enterButton = wrapper.find('[data-testid="enter-button"]');
+        const buttons = wrapper.findAll('[data-testclass="number-button"]');
+        await buttons[0].trigger('click');
+        await buttons[3].trigger('click');
+        await buttons[1].trigger('click');
+        await buttons[8].trigger('click');
+        expect(pin.text()).toEqual('****');
+        await enterButton.trigger('click');
+        expect(modalController.dismiss).toHaveBeenCalledTimes(1);
+        expect(modalController.dismiss).toHaveBeenCalledWith('1429');
       });
     });
   });

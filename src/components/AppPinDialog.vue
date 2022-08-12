@@ -3,7 +3,7 @@
     <ion-toolbar>
       <ion-title>{{ title }}</ion-title>
       <ion-buttons v-if="!setPasscodeMode" slot="primary">
-        <ion-button icon-only @click="cancel">
+        <ion-button icon-only @click="cancel" data-testid="cancel-button">
           <ion-icon :icon="close"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -17,7 +17,7 @@
     <ion-label data-testid="display-pin">
       <div class="pin">{{ displayPin }}</div>
     </ion-label>
-    <ion-label color="danger">
+    <ion-label color="danger" data-testid="error-message">
       <div class="error">{{ errorMessage }}</div>
     </ion-label>
   </ion-content>
@@ -96,7 +96,7 @@
   </ion-footer>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
   IonButton,
   IonButtons,
@@ -112,115 +112,81 @@ import {
   IonToolbar,
   modalController,
 } from '@ionic/vue';
+import { computed, ref } from 'vue';
 import { close } from 'ionicons/icons';
-import { computed, defineComponent, ref } from 'vue';
 
-export default defineComponent({
-  name: 'AppPinDialog',
-  components: {
-    IonButton,
-    IonButtons,
-    IonCol,
-    IonContent,
-    IonFooter,
-    IonGrid,
-    IonHeader,
-    IonIcon,
-    IonLabel,
-    IonRow,
-    IonTitle,
-    IonToolbar,
-  },
-  props: {
-    setPasscodeMode: Boolean,
-  },
-  setup(props) {
-    let verifyPin = '';
-
-    const errorMessage = ref('');
-    const pin = ref('');
-    const prompt = ref('');
-    const title = ref('');
-
-    const disableDelete = computed(() => !pin.value.length);
-    const disableEnter = computed(() => !(pin.value.length > 2));
-    const disableInput = computed(() => pin.value.length > 8);
-
-    const displayPin = computed(() => '*********'.slice(0, pin.value.length));
-
-    function initSetPasscodeMode() {
-      prompt.value = 'Create Session PIN';
-      title.value = 'Create PIN';
-      verifyPin = '';
-      pin.value = '';
-    }
-
-    function initUnlockMode() {
-      prompt.value = 'Enter PIN to Unlock';
-      title.value = 'Unlock';
-      pin.value = '';
-    }
-
-    function initVerifyMode() {
-      prompt.value = 'Verify PIN';
-      verifyPin = pin.value;
-      pin.value = '';
-    }
-
-    function append(n: number) {
-      errorMessage.value = '';
-      pin.value = pin.value.concat(n.toString());
-    }
-
-    function cancel() {
-      modalController.dismiss(undefined, 'cancel');
-    }
-
-    function enter() {
-      if (props.setPasscodeMode) {
-        if (!verifyPin) {
-          initVerifyMode();
-        } else if (verifyPin === pin.value) {
-          modalController.dismiss(pin.value);
-        } else {
-          errorMessage.value = 'PINS do not match';
-          initSetPasscodeMode();
-        }
-      } else {
-        modalController.dismiss(pin.value);
-      }
-    }
-
-    function remove() {
-      if (pin.value) {
-        pin.value = pin.value.slice(0, pin.value.length - 1);
-      }
-    }
-
-    if (props.setPasscodeMode) {
-      initSetPasscodeMode();
-    } else {
-      initUnlockMode();
-    }
-
-    return {
-      close,
-
-      disableDelete,
-      disableEnter,
-      disableInput,
-      displayPin,
-      errorMessage,
-      prompt,
-      title,
-
-      append,
-      cancel,
-      enter,
-      remove,
-    };
-  },
+// eslint-disable-next-line no-undef
+const props = defineProps({
+  setPasscodeMode: Boolean,
 });
+
+let verifyPin = '';
+
+const errorMessage = ref('');
+const pin = ref('');
+const prompt = ref('');
+const title = ref('');
+
+const disableDelete = computed(() => !pin.value.length);
+const disableEnter = computed(() => !(pin.value.length > 2));
+const disableInput = computed(() => pin.value.length > 8);
+
+const displayPin = computed(() => '*********'.slice(0, pin.value.length));
+
+const initSetPasscodeMode = () => {
+  prompt.value = 'Create Session PIN';
+  title.value = 'Create PIN';
+  verifyPin = '';
+  pin.value = '';
+};
+
+const initUnlockMode = () => {
+  prompt.value = 'Enter PIN to Unlock';
+  title.value = 'Unlock';
+  pin.value = '';
+};
+
+const initVerifyMode = () => {
+  prompt.value = 'Verify PIN';
+  verifyPin = pin.value;
+  pin.value = '';
+};
+
+const append = (n: number) => {
+  errorMessage.value = '';
+  pin.value = pin.value.concat(n.toString());
+};
+
+const cancel = () => {
+  modalController.dismiss(undefined, 'cancel');
+};
+
+const enter = () => {
+  if (props.setPasscodeMode) {
+    if (!verifyPin) {
+      initVerifyMode();
+    } else if (verifyPin === pin.value) {
+      modalController.dismiss(pin.value);
+    } else {
+      errorMessage.value = 'PINs do not match';
+      initSetPasscodeMode();
+    }
+  } else {
+    modalController.dismiss(pin.value);
+  }
+};
+
+const remove = () => {
+  if (pin.value) {
+    pin.value = pin.value.slice(0, pin.value.length - 1);
+  }
+};
+
+if (props.setPasscodeMode) {
+  initSetPasscodeMode();
+} else {
+  initUnlockMode();
+}
 </script>
 
 <style scoped>

@@ -8,14 +8,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'ExploreContainer',
-  props: {
-    name: String,
-  },
+<script setup lang="ts">
+// eslint-disable-next-line no-undef
+defineProps({
+  name: String,
 });
 </script>
 
