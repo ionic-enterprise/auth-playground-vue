@@ -1,6 +1,5 @@
 import { BiometricPermissionState, Device, DeviceSecurityType, VaultType } from '@ionic-enterprise/identity-vault';
 import useVaultFactory from '@/composables/vault-factory';
-import router from '@/router';
 import { isPlatform, modalController } from '@ionic/vue';
 import AppPinDialog from '@/components/AppPinDialog.vue';
 import { Preferences } from '@capacitor/preferences';
