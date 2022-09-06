@@ -7,7 +7,7 @@
     "build": "vue-cli-service build && cap sync",
     "lint": "vue-cli-service lint",
     "prepare": "husky install",
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --port=8100",
     "test": "npm run test:unit",
     "test:dev": "vue-cli-service test:unit --watch",
     "test:unit": "vue-cli-service test:unit",
@@ -28,8 +28,10 @@
     "@ionic/vue-router": "^6.0.0",
     "axios": "~0.27.2",
     "core-js": "^3.6.5",
+    "vee-validate": "~4.6.7",
     "vue": "^3.2.21",
-    "vue-router": "^4.0.12"
+    "vue-router": "^4.0.12",
+    "yup": "~0.32.11"
   },
   "devDependencies": {
     "@capacitor/cli": "^4.0.1",
@@ -56,7 +58,8 @@
     "prettier": "~2.7.1",
     "pretty-quick": "~3.1.3",
     "ts-jest": "^27.0.7",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "wait-for-expect": "~3.0.2"
   },
   "prettier": "@ionic/prettier-config"
 }
