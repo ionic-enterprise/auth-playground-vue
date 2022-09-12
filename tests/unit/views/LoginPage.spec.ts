@@ -3,9 +3,11 @@ import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { Router, createRouter, createWebHistory } from 'vue-router';
 import waitForExpect from 'wait-for-expect';
 import useAuth from '@/composables/auth';
+import useSessionVault from '@/composables/session-vault';
 import { AuthProvider } from '@/models/AuthProvider';
 
 jest.mock('@/composables/auth');
+jest.mock('@/composables/session-vault');
 
 describe('LoginPage.vue', () => {
   let router: Router;
@@ -94,10 +96,17 @@ describe('LoginPage.vue', () => {
       await password.setValue('test');
     });
 
+    it('initializes the vault unlock mode', async () => {
+      const { initializeUnlockMode } = useSessionVault();
+      const button = wrapper.find('[data-testid="basic-signin-button"]');
+      await button.trigger('click');
+      expect(initializeUnlockMode).toHaveBeenCalledTimes(1);
+    });
+
     it('performs the login', async () => {
       const { login } = useAuth();
       const button = wrapper.find('[data-testid="basic-signin-button"]');
-      button.trigger('click');
+      await button.trigger('click');
       expect(login).toHaveBeenCalledTimes(1);
       expect(login).toHaveBeenCalledWith('Basic', 'test@test.com', 'test');
     });
@@ -106,7 +115,7 @@ describe('LoginPage.vue', () => {
       it('does not show an error', async () => {
         const button = wrapper.find('[data-testid="basic-signin-button"]');
         const msg = wrapper.find('[data-testid="error-message"]');
-        button.trigger('click');
+        await button.trigger('click');
         await flushPromises();
         expect(msg.text()).toBe('');
       });
@@ -114,7 +123,7 @@ describe('LoginPage.vue', () => {
       it('navigates to the root page', async () => {
         const button = wrapper.find('[data-testid="basic-signin-button"]');
         router.replace = jest.fn();
-        button.trigger('click');
+        await button.trigger('click');
         await flushPromises();
         expect(router.replace).toHaveBeenCalledTimes(1);
         expect(router.replace).toHaveBeenCalledWith('/');

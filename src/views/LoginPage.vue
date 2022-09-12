@@ -90,6 +90,7 @@ import { useForm, useField } from 'vee-validate';
 import { object as yupObject, string as yupString } from 'yup';
 import { AuthProvider } from '@/models';
 import useAuth from '@/composables/auth';
+import useSessionVault from '@/composables/session-vault';
 
 const errorMessage = ref<string>();
 
@@ -103,10 +104,12 @@ const { value: password } = useField<string>('password');
 const formIsValid = computed(() => meta.value.valid);
 
 const { login } = useAuth();
+const { initializeUnlockMode } = useSessionVault();
 const router = useRouter();
 
 const signIn = async (provider: AuthProvider): Promise<void> => {
   try {
+    await initializeUnlockMode();
     await (provider === 'Basic' ? login(provider, email.value, password.value) : login(provider));
     router.replace('/');
   } catch (err) {
