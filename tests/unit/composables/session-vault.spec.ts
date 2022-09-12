@@ -136,10 +136,16 @@ describe('useSessionVault', () => {
         (isPlatform as jest.Mock).mockReturnValue(false);
       });
 
-      it('does not update the config', async () => {
+      it('uses secure storage', async () => {
+        const expectedConfig = {
+          ...mockVault.config,
+          type: VaultType.SecureStorage,
+          deviceSecurityType: DeviceSecurityType.None,
+        };
         const { initializeUnlockMode } = useSessionVault();
         await initializeUnlockMode();
-        expect(mockVault.updateConfig).not.toHaveBeenCalled();
+        expect(mockVault.updateConfig).toHaveBeenCalledTimes(1);
+        expect(mockVault.updateConfig).toHaveBeenCalledWith(expectedConfig);
       });
     });
   });

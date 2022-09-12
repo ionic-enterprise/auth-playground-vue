@@ -98,6 +98,8 @@ const initializeUnlockMode = async (): Promise<void> => {
     } else {
       await setUnlockMode('SessionPIN');
     }
+  } else {
+    await setUnlockMode('NeverLock');
   }
 };
 
