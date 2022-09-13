@@ -1,9 +1,13 @@
 import { mount, VueWrapper } from '@vue/test-utils';
 import UnlockPage from '@/views/UnlockPage.vue';
 import { createRouter, createWebHistory, Router } from 'vue-router';
+import useAuth from '@/composables/auth';
+import useSessionVault from '@/composables/session-vault';
+
+jest.mock('@/composables/auth');
+jest.mock('@/composables/session-vault');
 
 let router: Router;
-
 const mountView = async (): Promise<VueWrapper<any>> => {
   router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
@@ -11,6 +15,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
   });
   router.push('/');
   await router.isReady();
+  router.replace = jest.fn().mockResolvedValue(undefined);
   return mount(UnlockPage, {
     global: {
       plugins: [router],
@@ -19,11 +24,62 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 };
 
 describe('UnlockPage.vue', () => {
-  it('displays the title', async () => {
+  it('displays an unlock prompt', async () => {
     const wrapper = await mountView();
-    const titles = wrapper.findAll('ion-title');
-    expect(titles).toHaveLength(2);
-    expect(titles[0].text()).toBe('Unlock');
-    expect(titles[1].text()).toBe('Unlock');
+    const prompt = wrapper.find('[data-testid="unlock-button"]');
+    expect(prompt.text()).toBe('Unlock');
+  });
+
+  it('displays a redo login prompt', async () => {
+    const wrapper = await mountView();
+    const prompt = wrapper.find('[data-testid="redo-button"]');
+    expect(prompt.text()).toBe('Redo Sign In');
+  });
+
+  describe('the unlock button', () => {
+    it('unlocks the vault', async () => {
+      const { unlock } = useSessionVault();
+      const wrapper = await mountView();
+      const button = wrapper.find('[data-testid="unlock-button"]');
+      await button.trigger('click');
+      expect(unlock).toHaveBeenCalledTimes(1);
+    });
+
+    it('navigates to the root', async () => {
+      const wrapper = await mountView();
+      const button = wrapper.find('[data-testid="unlock-button"]');
+      await button.trigger('click');
+      expect(router.replace).toHaveBeenCalledTimes(1);
+      expect(router.replace).toHaveBeenCalledWith('/');
+    });
+
+    describe('when the user cancels', () => {
+      it('does not navigate', async () => {
+        const { unlock } = useSessionVault();
+        (unlock as jest.Mock).mockRejectedValue(new Error('whatever, dude'));
+        const wrapper = await mountView();
+        const button = wrapper.find('[data-testid="unlock-button"]');
+        await button.trigger('click');
+        expect(router.replace).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('the redo button', () => {
+    it('performs a logout', async () => {
+      const { logout } = useAuth();
+      const wrapper = await mountView();
+      const button = wrapper.find('[data-testid="redo-button"]');
+      await button.trigger('click');
+      expect(logout).toHaveBeenCalledTimes(1);
+    });
+
+    it('navigates to the login page', async () => {
+      const wrapper = await mountView();
+      const button = wrapper.find('[data-testid="redo-button"]');
+      await button.trigger('click');
+      expect(router.replace).toHaveBeenCalledTimes(1);
+      expect(router.replace).toHaveBeenCalledWith('/login');
+    });
   });
 });
