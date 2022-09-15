@@ -41,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'teas',
-        component: () => import('@/views/TeasPage.vue'),
+        component: () => import('@/views/TeaListPage.vue'),
         meta: { requiresAuth: true },
       },
       {
