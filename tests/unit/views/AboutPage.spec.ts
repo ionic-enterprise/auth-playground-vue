@@ -1,6 +1,7 @@
+import { Router } from 'vue-router';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import AboutPage from '@/views/AboutPage.vue';
-import { createRouter, createWebHistory, Router } from 'vue-router';
+import { createRouter, createWebHistory } from '@ionic/vue-router';
 import useAuth from '@/composables/auth';
 import useSessionVault from '@/composables/session-vault';
 

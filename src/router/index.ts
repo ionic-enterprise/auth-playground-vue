@@ -50,6 +50,16 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'vault-control/device-info',
+        component: () => import('@/views/DeviceInfoPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'vault-control/values',
+        component: () => import('@/views/ValueListPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'about',
         component: () => import('@/views/AboutPage.vue'),
         meta: { requiresAuth: true },

@@ -1,9 +1,14 @@
-import { BiometricPermissionState, Device, DeviceSecurityType, VaultType } from '@ionic-enterprise/identity-vault';
+import {
+  BiometricPermissionState,
+  Device,
+  DeviceSecurityType,
+  IdentityVaultConfig,
+  VaultType,
+} from '@ionic-enterprise/identity-vault';
 import useVaultFactory from '@/composables/vault-factory';
 import { isPlatform, modalController } from '@ionic/vue';
 import AppPinDialog from '@/components/AppPinDialog.vue';
 import { Preferences } from '@capacitor/preferences';
-import { VaultConfig } from '@ionic-enterprise/identity-vault/dist/typings/definitions';
 
 export type UnlockMode = 'Device' | 'SystemPIN' | 'SessionPIN' | 'NeverLock' | 'ForceLogin';
 
@@ -108,7 +113,7 @@ const canUnlock = async (): Promise<boolean> => {
   return value !== 'NeverLock' && !(await vault.isEmpty()) && (await vault.isLocked());
 };
 
-const getConfig = (): Promise<VaultConfig> => vault.config;
+const getConfig = (): IdentityVaultConfig => vault.config;
 const getKeys = async (): Promise<Array<string>> => vault.getKeys();
 
 const getValue = async <T>(key: string): Promise<T | undefined> => vault.getValue(key);

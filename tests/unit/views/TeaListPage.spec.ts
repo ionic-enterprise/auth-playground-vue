@@ -1,7 +1,8 @@
 import { mount, VueWrapper } from '@vue/test-utils';
 import TeaListPage from '@/views/TeaListPage.vue';
-import { createRouter, createWebHistory, Router } from 'vue-router';
+import { createRouter, createWebHistory } from '@ionic/vue-router';
 import useTea from '@/composables/tea';
+import { Router } from 'vue-router';
 
 jest.mock('@/composables/tea');
 
