@@ -3,6 +3,7 @@
   "description": "Identity Vault and Auth Connect Playground",
   "version": "0.0.1",
   "private": true,
+  "author": "Ionic Framework",
   "scripts": {
     "build": "vue-cli-service build && cap sync",
     "lint": "vue-cli-service lint",
@@ -22,8 +23,8 @@
     "@capacitor/keyboard": "^4.0.1",
     "@capacitor/preferences": "~4.0.1",
     "@capacitor/status-bar": "^4.0.1",
-    "@ionic-enterprise/auth": "~3.9.5",
-    "@ionic-enterprise/identity-vault": "~5.9.2",
+    "@ionic-enterprise/auth": "3.9.5",
+    "@ionic-enterprise/identity-vault": "5.9.3",
     "@ionic/vue": "^6.0.0",
     "@ionic/vue-router": "^6.0.0",
     "axios": "~0.27.2",
