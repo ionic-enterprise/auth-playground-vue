@@ -103,10 +103,4 @@ export class OIDCAuthenticationService extends IonicAuth implements Authenticato
       }
     }
   }
-
-  async onLogout(): Promise<void> {
-    if (this.tokenStorageProvider.clear) {
-      await this.tokenStorageProvider.clear();
-    }
-  }
 }
