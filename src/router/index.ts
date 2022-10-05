@@ -3,13 +3,13 @@ import { NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw } from 'vu
 import StartPage from '../views/StartPage.vue';
 import useAuth from '@/composables/auth';
 
-const { isAuthenticated } = useAuth();
-
 const checkAuthStatus = async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) => {
+  const { isAuthenticated } = useAuth();
+
   if (to.matched.some((r) => r.meta.requiresAuth)) {
     if (!(await isAuthenticated())) {
       return next('/login');

@@ -9,12 +9,14 @@ import useVaultFactory from '@/composables/vault-factory';
 import { isPlatform, modalController } from '@ionic/vue';
 import AppPinDialog from '@/components/AppPinDialog.vue';
 import { Preferences } from '@capacitor/preferences';
+import router from '@/router';
 
 export type UnlockMode = 'Device' | 'SystemPIN' | 'SessionPIN' | 'NeverLock' | 'ForceLogin';
 
 const modeKey = 'LastUnlockMode';
 
 const { createVault } = useVaultFactory();
+
 const vault = createVault({
   key: 'io.ionic.auth-playground-vue',
   type: VaultType.SecureStorage,
@@ -36,6 +38,10 @@ vault.onPasscodeRequested(async (isPasscodeSetRequest: boolean) => {
   await modal.present();
   const { data } = await modal.onDidDismiss();
   vault.setCustomPasscode(data || '');
+});
+
+vault.onLock(() => {
+  router.replace('/unlock');
 });
 
 const provision = async (): Promise<void> => {
