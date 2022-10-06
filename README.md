@@ -1,10 +1,8 @@
-# Angular Auth Playground
+# Vue Auth Playground
 
-**Note:** This version of the demo application is WIP. This README is currently just a copy of the NG README.
+This application highlights the use of the Ionic Enterprise <a href="https://ionic.io/docs/auth-connect" target="_blank">Auth Connect</a> and <a href="https://ionic.io/docs/identity-vault/" target="_blank">Identity Vault</a> products in an Vue application. The application runs on both Android and iOS. In addition, it supports running in the web, allowing developers to remain in a more comfortable and productive web-based development environments while working on the application. Since the web does not have a secure biometrically locked key storage mechanism, however, the full potential of Identity Vault is only accessible through the native platforms.
 
-This application highlights the use of the Ionic Enterprise <a href="https://ionic.io/docs/auth-connect" target="_blank">Auth Connect</a> and <a href="https://ionic.io/docs/identity-vault/" target="_blank">Identity Vault</a> products in an Angular application. The application will run on both Android and iOS. In addition, it supports running in the web, allowing developers to remain in the more comfortable and productive web-based development environments while working on the application. Since the web does not have a secure biometrically locked key storage mechanism, however, the full potential of Identity Vault is only accessible through the native platforms.
-
-This application uses <a href="https://capacitorjs.com/docs/android/custom-code" target="_blank">Capacitor</a> to provide the native layer. This is the preferred technology to use for the native layer and the Customer Success team highly suggests using it over Cordova. However, Identity Vault and Auth Connect can both be used with either technology.
+This application uses <a href="https://capacitorjs.com/docs" target="_blank">Capacitor</a> to provide the native layer. This is the preferred technology to use for the native layer and the Customer Success team highly suggests using it over Cordova. However, Identity Vault and Auth Connect can both be used with either technology.
 
 The purpose of this application is to show the use of much of the `Vault` and `Device` APIs of Identity Vault as well as how Identity Vault and Auth Connect work together to provide a secure authentication solution.
 
@@ -16,7 +14,7 @@ Once the access is set up, the build processes is the same as for most Ionic app
 
 - `npm install`
 - `npm run build`
-- to start a development server: `npm start`
+- to start a development server: `npm run serve`
 - to run on an Android device: `ionic cap run android`
 - to run on an iOS device: `ionic cap run ios` (you may need to run `ionic cap start ios` and update the development team)
 
@@ -24,15 +22,53 @@ One final note: this app may or may not work on an emulator. When working with b
 
 ## Significant Architecture
 
-### The Session Vault Service
+### The Authentication Services
 
-The session vault service defines the interface to the Identity Vault. When being used in an application that also uses Auth Connect, this service will typically do the following:
+#### Authenticator Interface
+
+The `Authenticator` interface provides a consistent set of methods that are used across our HTTP Basic Auth service as well as our OIDC authentication service. This way, no matter which type of authentication we are using the rest of our application can rely on having a simple, well-defined service level API.
+
+#### Basic Authentication Service
+
+The `BasicAuthenticationService` is used to perform a basic HTTP based authentication where the application itself gathers the credentials and then sends them to the backend to be verified. A token is returned by the backend. This is easily the least secure of all of the methods presented because:
+
+- The application obtains the credentials instead of the backend system performing the authentication.
+- As a result, those credentials are sent across the wire to the backend that will do the authentication.
+- The protocol we have implemented has a single long-lived token rather than short lived tokens with a long lived refresh token.
+
+Obviously, some of this we could could be solidified from a security standpoint. However, the fact that the user stays in the app in order to enter their credentials is a serious flaw that would take more work to get around. This makes using Auth Connect with the OIDC providers a far better choice for applications where security is important.
+
+#### OIDC Authentication Service
+
+The `OIDCAuthenticationService` extends the `IonicAuth` class from Auth Connect. This code encapsulates the configuration for each of the services this application supports: AWS Cognito, Azure, and Auth0.
+
+The important thing to notice here is how little actual code is needed. Most of what needs to be provided is configuration. The only code that is truly required is the code that extends the base class passing our configuration in the constructor. The override of the `login()` method is only required due to a quirk with Azure's password reset functionality. If that quirk did not exist, we would not even need that.
+
+### The Token Storage Provider
+
+When constructing the authentication services a token storage provider is specified. The token storage provider can either be the `vault` object or an object that implements <a href="https://ionic.io/docs/auth-connect/interfaces/tokenstorageprovider" target="_blank">a specific interface</a>. If you do not specify a token storage provider, Auth Connect will use a default provider that utilizes `localstorage`. The default provider, however, is only intended for development use. In a production scenario we suggest pairing Auth Connect with Identity Vault for a complete authentication solution.
+
+**Note:** while the token storage provider _can_ be specified as the `vault` created by Identity Vault, this application creates its own object using the `TokenStorageProvider` interface. This allows more flexibility in controlling the exact actions of the vault.
+
+### Composables
+
+#### Auth
+
+The Auth composable abstracts the authentication functions that are required by the rest of the app. This composable is responsible for:
+
+- instantiating the proper Authentication service
+- tracking the currently used provider so the proper service can be instantiated upon application restart
+- calling the appropriate service when required
+
+#### Session Vault
+
+The session vault composable defines the interface to the Identity Vault. When being used in an application that also uses Auth Connect, this composable will typically do the following:
 
 - Instantiate the `Vault` object.
-- Expose the `Vault` object so it can be used by Auth Connect as a token storage provider.
-- Expose any methods needed throughout the rest of the system, even if the methods just pass-through to a method on the `Vault` object.
+- Expose the `Vault` object so it can be used by Auth Connect as a token storage provider OR create a `TokenStorageProvider` object that utilizes the `Vault` object (we do the latter in this app).
+- Expose any functions needed throughout the rest of the system
 
-Typically, the added methods would be ones like:
+Typically, the functions would be ones like:
 
 - `unlock()`
 - `canUnlock()`
@@ -40,38 +76,6 @@ Typically, the added methods would be ones like:
 - `setUnlockMode()`
 
 We have gone beyond that with this application so we could allow the user to manually perform some vault operations that would typically be automatically managed by either Auth Connect or Identity Vault (`lock()`, `clear()`, etc).
-
-**Important:** you may ask why we create methods like `unlock()` that just pass through to the vault's `unlock()`. The reason for this is to create an adaptor class layer to protect the rest of the application from potential changes to the Identity Vault API. Creating an adapter class is a good pattern to follow with any external dependency to your application.
-
-### The Authentication Services
-
-#### Authentication Expeditor Service
-
-The `AuthenticationExpeditorService` is a layer that allows us to use different methods for authentication, and then manages how the user is currently authenticated so the proper flows can be followed. The idea is to abstract all of the associated business logic of managing the provider to this layer.
-
-In an architecture that support only one provider (which is more typical), this layer is not necessary and you would directly use the single `AuthenticationService` instead. That is, you would likely have a single `AuthenticationService` that is similar to this application's `AwsAuthenticationService`, and you would directly use it instead.
-
-#### AWS Authentication Service
-
-The `AwsAuthenticationService` is how this application interfaces with Auth Connect in order to provide access to our AWS Cognito authentication provider. This service only needs to provide the proper configuration. You can override existing methods or add new ones if you need to provide more functionality.
-
-#### Azure Authentication Service
-
-The `AzureAuthenticationService` is how this application interfaces with Auth Connect in order to provide access to our Azure Active Directory authentication provider. This service provides the proper configuration as well as overrides the `login()` method due to some peculiarities with how a password change needs to be handled with Azure.
-
-#### Basic Authentication Service
-
-The `BasicAuthenticationService` is used to perform a basic HTTP based authentication where the application itself gathers the credentials and then sends them to the backend to be verified and a token is returned. This is easily the least secure of all of the methods presented because:
-
-- The application obtains the credentials instead of the backend system performing the authentication.
-- As a result, those credentials are sent across the wire to the backend that will do the authentication.
-- The protocol we have implemented has a single long-lived token rather than short lived tokens with a long lived refresh token.
-
-Obviously, some of this we could do some work to get around. However, the fact that the user stays in the app in order to enter their credentials is a serious flaw that would take more work to get around. This makes using Auth Connect with the OIDC providers a far better choice for applications where security is important.
-
-#### The Token Storage Provider
-
-With the OIDC related services, we also specify a token storage provider, using the `vault` object from our `SessionVaultService`. If you do not specify a token storage provider, Auth Connect will use a default provider that utilizes `localstorage`. The default provider, however, is only intended for development use. In a production scenario we suggest pairing Auth Connect with Identity Vault for a complete solution.
 
 ### The PIN Dialog
 
@@ -103,27 +107,31 @@ Our component implements a different workflow depending on whether `setPasscodeM
   }
 ```
 
+#### Backend API
+
+The backend API composable sets the Axios configuration to access our backend API. It also defines a couple of HTTTP interceptors that we need.
+
+##### The Request Interceptor
+
+The Request interceptor operates on outbound requests. It gets the access token from the authentication service and appends it to the headers as a bearer token.
+
+If an access token cannot be obtained, the request will still be sent, but it will be sent without a bearer token. In such a case, if the API requires a token in order to process the request it should result in a 401 error.
+
+##### The Response Interceptor
+
+The Response interceptor examines HTTP responses and redirects to the login page when result has a 401 error status.
+
 ### Auth Guard
 
 This application has a single route guard that determines if the user is authenticated. It redirects to the login page if they are not. To determine if the user is authenticated, it uses Auth Connect's `isAuthenticated()` method. This method resolves `true` or `false` depending on whether or not a non-expired access token exists. If the token exists but is expired, it will attempt a refresh operation first if the backend provider supports refresh tokens.
 
-### HTTP Interceptors
-
-#### The Auth Interceptor
-
-The Auth interceptor operates on outbound requests. It gets the access token from the authentication service and appends it to the headers as a bearer token.
-
-If an access token cannot be obtained, the request will still be sent, but it will be sent without a bearer token. In such a case, if the API requires a token in order to process the request it should result in a 401 error.
-
-#### The Unauth Interceptor
-
-The Unauth interceptor examines HTTP responses and redirects to the login page when result has a 401 error status.
+With a Vue application like this, the auth guard is set up along with the routes in `src/router`.
 
 ## Pages
 
 ### Login Page
 
-The login page allows the user to authenticate themselves via any of our providers. The AWS provider as well as the "Sign in with email" option use the following credentials:
+The login page allows the user to authenticate themselves via any of our providers. The AWS and Auth0 providers as well as the "Sign in with email" option use the following credentials:
 
 - **email:** `test@ionic.io`
 - **password:** `Ion54321`

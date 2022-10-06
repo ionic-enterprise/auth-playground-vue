@@ -29,6 +29,7 @@ const login = async (provider: AuthProvider, username?: string, password?: strin
   await Preferences.set({ key, value: provider });
   await (provider === 'Basic' ? authService?.login(username, password) : authService?.login());
 };
+
 const logout = async (): Promise<void> => {
   await initializeAuthService();
   await authService?.logout();
