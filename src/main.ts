@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './router';
 
 import { IonicVue } from '@ionic/vue';
+import { Device } from '@ionic-enterprise/identity-vault';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -26,6 +27,8 @@ import './theme/custom-colors.css';
 import './theme/style.css';
 
 const app = createApp(App).use(IonicVue).use(router);
+
+Device.setHideScreenOnBackground(true);
 
 router.isReady().then(() => {
   app.mount('#app');
