@@ -90,6 +90,7 @@ export class OIDCAuthenticationService extends IonicAuth implements Authenticato
     try {
       await super.login();
     } catch (err: any) {
+      // eslint-disable-next-line
       console.log('login error:', +err);
       const message: string = err.message;
       if (this.provider === 'Azure' && message !== undefined && message.startsWith('AADB2C90118')) {
