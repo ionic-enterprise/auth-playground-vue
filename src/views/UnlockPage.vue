@@ -23,19 +23,27 @@ import useSessionVault from '@/composables/session-vault';
 
 const router = useRouter();
 const { logout } = useAuth();
-const { unlock } = useSessionVault();
+const { canUnlock, unlock } = useSessionVault();
 
 const redoClicked = async (): Promise<void> => {
   await logout();
   await router.replace('/login');
 };
 
-const unlockClicked = async (): Promise<void> => {
+const tryUnlock = async (): Promise<void> => {
   try {
     await unlock();
     await router.replace('/');
   } catch (err) {
     null;
+  }
+};
+
+const unlockClicked = async (): Promise<void> => {
+  if (await canUnlock()) {
+    tryUnlock();
+  } else {
+    await router.replace('/login');
   }
 };
 </script>

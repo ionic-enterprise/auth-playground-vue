@@ -35,7 +35,7 @@
     "yup": "~0.32.11"
   },
   "devDependencies": {
-    "@capacitor/assets": "~1.0.10",
+    "@capacitor/assets": "~2.0.0",
     "@capacitor/cli": "^4.0.1",
     "@ionic/prettier-config": "~2.0.0",
     "@types/jest": "^27.0.2",
@@ -54,7 +54,7 @@
     "babel-jest": "^27.3.1",
     "cypress": "~10.4.0",
     "eslint": "^8.4.1",
-    "eslint-plugin-vue": "~9.6.0",
+    "eslint-plugin-vue": "~9.7.0",
     "husky": "~8.0.1",
     "jest": "^27.3.1",
     "prettier": "~2.7.1",

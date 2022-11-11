@@ -1,4 +1,4 @@
-import { mount, VueWrapper } from '@vue/test-utils';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import UnlockPage from '@/views/UnlockPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import useAuth from '@/composables/auth';
@@ -25,6 +25,10 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 };
 
 describe('UnlockPage.vue', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('displays an unlock prompt', async () => {
     const wrapper = await mountView();
     const prompt = wrapper.find('[data-testid="unlock-button"]');
@@ -38,30 +42,65 @@ describe('UnlockPage.vue', () => {
   });
 
   describe('the unlock button', () => {
-    it('unlocks the vault', async () => {
-      const { unlock } = useSessionVault();
-      const wrapper = await mountView();
-      const button = wrapper.find('[data-testid="unlock-button"]');
-      await button.trigger('click');
-      expect(unlock).toHaveBeenCalledTimes(1);
-    });
+    describe('while the user can unlock', () => {
+      beforeEach(() => {
+        const { canUnlock } = useSessionVault();
+        (canUnlock as jest.Mock).mockResolvedValue(true);
+      });
 
-    it('navigates to the root', async () => {
-      const wrapper = await mountView();
-      const button = wrapper.find('[data-testid="unlock-button"]');
-      await button.trigger('click');
-      expect(router.replace).toHaveBeenCalledTimes(1);
-      expect(router.replace).toHaveBeenCalledWith('/');
-    });
-
-    describe('when the user cancels', () => {
-      it('does not navigate', async () => {
+      it('unlocks the vault', async () => {
         const { unlock } = useSessionVault();
-        (unlock as jest.Mock).mockRejectedValue(new Error('whatever, dude'));
         const wrapper = await mountView();
         const button = wrapper.find('[data-testid="unlock-button"]');
         await button.trigger('click');
-        expect(router.replace).not.toHaveBeenCalled();
+        await flushPromises();
+        expect(unlock).toHaveBeenCalledTimes(1);
+      });
+
+      it('navigates to the root', async () => {
+        const wrapper = await mountView();
+        const button = wrapper.find('[data-testid="unlock-button"]');
+        await button.trigger('click');
+        await flushPromises();
+        expect(router.replace).toHaveBeenCalledTimes(1);
+        expect(router.replace).toHaveBeenCalledWith('/');
+      });
+
+      describe('when the user cancels', () => {
+        it('does not navigate', async () => {
+          const { unlock } = useSessionVault();
+          (unlock as jest.Mock).mockRejectedValue(new Error('whatever, dude'));
+          const wrapper = await mountView();
+          const button = wrapper.find('[data-testid="unlock-button"]');
+          await button.trigger('click');
+          await flushPromises();
+          expect(router.replace).not.toHaveBeenCalled();
+        });
+      });
+    });
+
+    describe('when the user can no longer unlock', () => {
+      beforeEach(() => {
+        const { canUnlock } = useSessionVault();
+        (canUnlock as jest.Mock).mockResolvedValue(false);
+      });
+
+      it('unlocks the vault', async () => {
+        const { unlock } = useSessionVault();
+        const wrapper = await mountView();
+        const button = wrapper.find('[data-testid="unlock-button"]');
+        await button.trigger('click');
+        await flushPromises();
+        expect(unlock).not.toHaveBeenCalled();
+      });
+
+      it('navigates to the login', async () => {
+        const wrapper = await mountView();
+        const button = wrapper.find('[data-testid="unlock-button"]');
+        await button.trigger('click');
+        await flushPromises();
+        expect(router.replace).toHaveBeenCalledTimes(1);
+        expect(router.replace).toHaveBeenCalledWith('/login');
       });
     });
   });
