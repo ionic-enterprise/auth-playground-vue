@@ -2,8 +2,8 @@ import LoginPage from '@/views/LoginPage.vue';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import waitForExpect from 'wait-for-expect';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 import { AuthProvider } from '@/models/AuthProvider';
 import { Router } from 'vue-router';
 
@@ -97,13 +97,6 @@ describe('LoginPage.vue', () => {
       await password.setValue('test');
     });
 
-    it('initializes the vault unlock mode', async () => {
-      const { initializeUnlockMode } = useSessionVault();
-      const button = wrapper.find('[data-testid="basic-signin-button"]');
-      await button.trigger('click');
-      expect(initializeUnlockMode).toHaveBeenCalledTimes(1);
-    });
-
     it('performs the login', async () => {
       const { login } = useAuth();
       const button = wrapper.find('[data-testid="basic-signin-button"]');
@@ -113,6 +106,13 @@ describe('LoginPage.vue', () => {
     });
 
     describe('if the login succeeds', () => {
+      it('initializes the vault unlock mode', async () => {
+        const { initializeUnlockMode } = useSessionVault();
+        const button = wrapper.find('[data-testid="basic-signin-button"]');
+        await button.trigger('click');
+        expect(initializeUnlockMode).toHaveBeenCalledTimes(1);
+      });
+
       it('does not show an error', async () => {
         const button = wrapper.find('[data-testid="basic-signin-button"]');
         const msg = wrapper.find('[data-testid="error-message"]');
@@ -135,6 +135,13 @@ describe('LoginPage.vue', () => {
       beforeEach(() => {
         const { login } = useAuth();
         (login as jest.Mock).mockRejectedValue(new Error('the login failed'));
+      });
+
+      it('does not initialize the vault unlock mode', async () => {
+        const { initializeUnlockMode } = useSessionVault();
+        const button = wrapper.find('[data-testid="basic-signin-button"]');
+        await button.trigger('click');
+        expect(initializeUnlockMode).not.toHaveBeenCalled();
       });
 
       it('shows an error', async () => {

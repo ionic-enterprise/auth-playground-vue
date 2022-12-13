@@ -2,7 +2,7 @@ import { Router } from 'vue-router';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import ValueListPage from '@/views/ValueListPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-import useVault from '@/composables/session-vault';
+import { useSessionVault } from '@/composables/session-vault';
 import { alertController } from '@ionic/vue';
 
 jest.mock('@/composables/session-vault');
@@ -34,7 +34,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 
 describe('ValueListPage.vue', () => {
   beforeEach(() => {
-    const vault = useVault();
+    const vault = useSessionVault();
     (vault.getKeys as jest.Mock).mockResolvedValue([]);
     jest.clearAllMocks();
   });
@@ -59,7 +59,7 @@ describe('ValueListPage.vue', () => {
 
   describe('with data', () => {
     beforeEach(() => {
-      const vault = useVault();
+      const vault = useSessionVault();
       (vault.getKeys as jest.Mock).mockResolvedValue(['foo', 'bar', 'baz']);
       (vault.getValue as jest.Mock).mockImplementation((key: string) => {
         return key === 'foo' ? 'cat' : key === 'bar' ? 'dog' : key === 'baz' ? 'mouse' : 'unknown';
@@ -113,7 +113,7 @@ describe('ValueListPage.vue', () => {
       });
 
       it('does not save anything', async () => {
-        const vault = useVault();
+        const vault = useSessionVault();
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="add-value-button"]');
         await button.trigger('click');
@@ -130,7 +130,7 @@ describe('ValueListPage.vue', () => {
       });
 
       it('does not save anything', async () => {
-        const vault = useVault();
+        const vault = useSessionVault();
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="add-value-button"]');
         await button.trigger('click');
@@ -147,7 +147,7 @@ describe('ValueListPage.vue', () => {
       });
 
       it('saves the item in the vault', async () => {
-        const vault = useVault();
+        const vault = useSessionVault();
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="add-value-button"]');
         await button.trigger('click');
@@ -157,7 +157,7 @@ describe('ValueListPage.vue', () => {
       });
 
       it('refreshes the item in the list', async () => {
-        const vault = useVault();
+        const vault = useSessionVault();
         (vault.getKeys as jest.Mock).mockResolvedValue(['bar', 'baz']);
         (vault.getValue as jest.Mock).mockImplementation((key: string) => {
           return key === 'bar' ? 'dog' : key === 'baz' ? 'mouse' : 'unknown';

@@ -30,8 +30,8 @@
 import { useRouter } from 'vue-router';
 import { IonButton, IonCard, IonCardContent, IonCardTitle, IonContent, IonIcon, IonPage } from '@ionic/vue';
 import { arrowRedoOutline, lockOpenOutline } from 'ionicons/icons';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 
 const router = useRouter();
 const { logout } = useAuth();

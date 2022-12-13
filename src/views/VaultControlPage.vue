@@ -84,9 +84,7 @@
 
         <ion-item>
           <ion-label>
-            <ion-button expand="block" @click="tokenStorage.clear" data-testid="clear-vault-button"
-              >Clear the Vault
-            </ion-button>
+            <ion-button expand="block" @click="clear" data-testid="clear-vault-button">Clear the Vault </ion-button>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -189,11 +187,11 @@ import {
   isPlatform,
 } from '@ionic/vue';
 import { ellipsisVerticalOutline, hardwareChipOutline, listOutline } from 'ionicons/icons';
-import useSessionVault, { UnlockMode } from '@/composables/session-vault';
+import { useSessionVault, UnlockMode } from '@/composables/session-vault';
 import { Device, VaultType } from '@ionic-enterprise/identity-vault';
 
 const router = useRouter();
-const { getConfig, lock, setUnlockMode, tokenStorage } = useSessionVault();
+const { getConfig, lock, setUnlockMode, clear } = useSessionVault();
 
 const disableCustomPasscode = ref<boolean>(true);
 const disableSystemPasscode = ref<boolean>(true);

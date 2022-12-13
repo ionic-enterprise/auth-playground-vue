@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { NavigationGuardNext, RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 import StartPage from '../views/StartPage.vue';
-import useAuth from '@/composables/auth';
+import { useAuth } from '@/composables/auth';
 
 const checkAuthStatus = async (
   to: RouteLocationNormalized,

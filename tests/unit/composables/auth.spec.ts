@@ -1,16 +1,17 @@
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
 import { AuthProvider } from '@/models';
 import { BasicAuthenticationService, OIDCAuthenticationService } from '@/services';
 import { Preferences } from '@capacitor/preferences';
 
+jest.mock('@/composables/session-vault');
+jest.mock('@/composables/vault-factory');
 jest.mock('@capacitor/preferences');
 jest.mock('@/services/basic-authentication-service');
 jest.mock('@/services/oidc-authentication-service');
-jest.mock('@/composables/vault-factory');
 
 describe('auth', () => {
   beforeEach(() => {
+    (Preferences.get as jest.Mock).mockResolvedValue({ value: undefined });
     jest.resetAllMocks();
   });
 
@@ -19,18 +20,20 @@ describe('auth', () => {
     await logout();
   });
 
-  const verifyBasicConstruction = (): void => {
-    const { tokenStorage } = useSessionVault();
-    expect(BasicAuthenticationService).toHaveBeenCalledTimes(1);
-    expect(BasicAuthenticationService).toHaveBeenCalledWith(tokenStorage);
-    expect(OIDCAuthenticationService).not.toHaveBeenCalled();
+  let mockBasicAuth: BasicAuthenticationService;
+  const getMockBasicAuth = (): BasicAuthenticationService => {
+    if (!mockBasicAuth) {
+      mockBasicAuth = (BasicAuthenticationService as jest.Mock).mock.instances[0];
+    }
+    return mockBasicAuth;
   };
 
-  const verifyOIDCConstruction = (provider: AuthProvider): void => {
-    const { tokenStorage } = useSessionVault();
-    expect(OIDCAuthenticationService).toHaveBeenCalledTimes(1);
-    expect(OIDCAuthenticationService).toHaveBeenCalledWith(provider, tokenStorage);
-    expect(BasicAuthenticationService).not.toHaveBeenCalled();
+  let mockOIDCAuth: OIDCAuthenticationService;
+  const getMockOIDCAuth = (): OIDCAuthenticationService => {
+    if (!mockOIDCAuth) {
+      mockOIDCAuth = (OIDCAuthenticationService as jest.Mock).mock.instances[0];
+    }
+    return mockOIDCAuth;
   };
 
   describe.each([
@@ -40,14 +43,17 @@ describe('auth', () => {
     ['Basic' as AuthProvider],
   ])('%s', (provider: AuthProvider) => {
     describe('login', () => {
-      it('constructs an OIDC authenticator', async () => {
+      it('sets up the OIDC authenticator', async () => {
         const { login } = useAuth();
         if (provider === 'Basic') {
           await login(provider, 'test@mctesty.com', 'MyPa$$w0rd');
-          verifyBasicConstruction();
+          getMockBasicAuth();
+          expect(true).toBeTruthy();
         } else {
           await login(provider);
-          verifyOIDCConstruction(provider);
+          const mockAuth = getMockOIDCAuth();
+          expect(mockAuth.setAuthProvider).toHaveBeenCalledTimes(1);
+          expect(mockAuth.setAuthProvider).toHaveBeenCalledWith(provider);
         }
       });
 
@@ -55,12 +61,12 @@ describe('auth', () => {
         const { login } = useAuth();
         if (provider === 'Basic') {
           await login(provider, 'test@mctesty.com', 'MyPa$$w0rd');
-          const mockAuth = (BasicAuthenticationService as jest.Mock).mock.instances[0];
+          const mockAuth = getMockBasicAuth();
           expect(mockAuth.login).toHaveBeenCalledTimes(1);
           expect(mockAuth.login).toHaveBeenCalledWith('test@mctesty.com', 'MyPa$$w0rd');
         } else {
           await login(provider);
-          const mockAuth = (OIDCAuthenticationService as jest.Mock).mock.instances[0];
+          const mockAuth = getMockOIDCAuth();
           expect(mockAuth.login).toHaveBeenCalledTimes(1);
           expect(mockAuth.login).toHaveBeenCalledWith();
         }
@@ -82,10 +88,7 @@ describe('auth', () => {
       const verifyLogoutCall = async (): Promise<void> => {
         const { isAuthenticated, logout } = useAuth();
         await isAuthenticated(); // prime the pump if need be
-        const mockAuth =
-          provider === 'Basic'
-            ? (BasicAuthenticationService as jest.Mock).mock.instances[0]
-            : (OIDCAuthenticationService as jest.Mock).mock.instances[0];
+        const mockAuth = provider === 'Basic' ? getMockBasicAuth() : getMockOIDCAuth();
         await logout();
         expect(mockAuth.logout).toHaveBeenCalledTimes(1);
         expect(mockAuth.logout).toHaveBeenCalledWith();
@@ -103,14 +106,16 @@ describe('auth', () => {
           expect(Preferences.get).toHaveBeenCalledWith({ key: 'AuthProvider' });
         });
 
-        it('constructs the service for the current provider', async () => {
+        it('sets up the OIDC service for the current provider', async () => {
           const { logout } = useAuth();
           await logout();
 
           if (provider === 'Basic') {
-            verifyBasicConstruction();
+            expect(true).toBeTruthy();
           } else {
-            verifyOIDCConstruction(provider);
+            const mockAuth = getMockOIDCAuth();
+            expect(mockAuth.setAuthProvider).toHaveBeenCalledTimes(1);
+            expect(mockAuth.setAuthProvider).toHaveBeenCalledWith(provider);
           }
         });
 
@@ -174,10 +179,7 @@ describe('auth', () => {
       const verifyIsAuthCall = async (): Promise<void> => {
         const { isAuthenticated } = useAuth();
         await isAuthenticated(); // prime the pump if need be
-        const mockAuth =
-          provider === 'Basic'
-            ? (BasicAuthenticationService as jest.Mock).mock.instances[0]
-            : (OIDCAuthenticationService as jest.Mock).mock.instances[0];
+        const mockAuth = provider === 'Basic' ? getMockBasicAuth() : getMockOIDCAuth();
         (mockAuth.isAuthenticated as jest.Mock).mockResolvedValue(true);
         expect(await isAuthenticated()).toBe(true);
         (mockAuth.isAuthenticated as jest.Mock).mockResolvedValue(false);
@@ -196,14 +198,16 @@ describe('auth', () => {
           expect(Preferences.get).toHaveBeenCalledWith({ key: 'AuthProvider' });
         });
 
-        it('constructs the service for the current provider', async () => {
+        it('setsup up the OIDC service for the current provider', async () => {
           const { isAuthenticated } = useAuth();
           await isAuthenticated();
 
           if (provider === 'Basic') {
-            verifyBasicConstruction();
+            expect(true).toBeTruthy();
           } else {
-            verifyOIDCConstruction(provider);
+            const mockAuth = getMockOIDCAuth();
+            expect(mockAuth.setAuthProvider).toHaveBeenCalledTimes(1);
+            expect(mockAuth.setAuthProvider).toHaveBeenCalledWith(provider);
           }
         });
 
@@ -272,10 +276,7 @@ describe('auth', () => {
       const verifyGetAccessTokenCall = async (): Promise<void> => {
         const { getAccessToken } = useAuth();
         await getAccessToken(); // prime the pump if need be
-        const mockAuth =
-          provider === 'Basic'
-            ? (BasicAuthenticationService as jest.Mock).mock.instances[0]
-            : (OIDCAuthenticationService as jest.Mock).mock.instances[0];
+        const mockAuth = provider === 'Basic' ? getMockBasicAuth() : getMockOIDCAuth();
         (mockAuth.getAccessToken as jest.Mock).mockResolvedValue('thisIsAToken');
         expect(await getAccessToken()).toEqual('thisIsAToken');
         (mockAuth.getAccessToken as jest.Mock).mockResolvedValue('thisIsADifferentToken');
@@ -294,14 +295,16 @@ describe('auth', () => {
           expect(Preferences.get).toHaveBeenCalledWith({ key: 'AuthProvider' });
         });
 
-        it('constructs the service for the current provider', async () => {
+        it('sets up the OIDC service for the current provider', async () => {
           const { getAccessToken } = useAuth();
           await getAccessToken();
 
           if (provider === 'Basic') {
-            verifyBasicConstruction();
+            expect(true).toBeTruthy();
           } else {
-            verifyOIDCConstruction(provider);
+            const mockAuth = getMockOIDCAuth();
+            expect(mockAuth.setAuthProvider).toHaveBeenCalledTimes(1);
+            expect(mockAuth.setAuthProvider).toHaveBeenCalledWith(provider);
           }
         });
 

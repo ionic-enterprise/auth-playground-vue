@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { Tea } from '@/models';
 import { Preferences } from '@capacitor/preferences';
-import useBackendAPI from './backend-api';
+import { useBackendAPI } from './backend-api';
 
 const { client } = useBackendAPI();
 const teas = ref<Array<Tea>>([]);
@@ -46,7 +46,7 @@ const rate = async (id: number, rating: number): Promise<void> => {
   }
 };
 
-export default () => ({
+export const useTea = () => ({
   find,
   refresh,
   rate,

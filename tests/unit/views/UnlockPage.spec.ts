@@ -1,8 +1,8 @@
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import UnlockPage from '@/views/UnlockPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 import { Router } from 'vue-router';
 
 jest.mock('@/composables/auth');

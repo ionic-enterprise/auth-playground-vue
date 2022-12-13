@@ -9,12 +9,27 @@
         <ion-card-content>
           <ion-list>
             <ion-item>
-              <ion-label position="floating">E-Mail Address</ion-label>
-              <ion-input data-testid="email-input" name="email" type="email" v-model="email" email required></ion-input>
+              <ion-input
+                data-testid="email-input"
+                label="E-Mail Address"
+                label-placement="floating"
+                name="email"
+                type="email"
+                v-model="email"
+                email
+                required
+              ></ion-input>
             </ion-item>
             <ion-item>
-              <ion-label position="floating">Password</ion-label>
-              <ion-input data-testid="password-input" name="password" type="password" v-model="password" required>
+              <ion-input
+                data-testid="password-input"
+                label="Password"
+                label-placement="floating"
+                name="password"
+                type="password"
+                v-model="password"
+                required
+              >
               </ion-input>
             </ion-item>
             <ion-item>
@@ -89,8 +104,8 @@ import { logoAmazon, logoMicrosoft } from 'ionicons/icons';
 import { useForm, useField } from 'vee-validate';
 import { object as yupObject, string as yupString } from 'yup';
 import { AuthProvider } from '@/models';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 
 const errorMessage = ref<string>();
 
@@ -109,8 +124,8 @@ const router = useRouter();
 
 const signIn = async (provider: AuthProvider): Promise<void> => {
   try {
-    await initializeUnlockMode();
     await (provider === 'Basic' ? login(provider, email.value, password.value) : login(provider));
+    await initializeUnlockMode();
     router.replace('/');
   } catch (err) {
     errorMessage.value = 'Invalid email and/or password';

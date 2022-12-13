@@ -5,7 +5,7 @@ import {
   IdentityVaultConfig,
   VaultType,
 } from '@ionic-enterprise/identity-vault';
-import useVaultFactory from '@/composables/vault-factory';
+import { useVaultFactory } from '@/composables/vault-factory';
 import { isPlatform, modalController } from '@ionic/vue';
 import AppPinDialog from '@/components/AppPinDialog.vue';
 import { Preferences } from '@capacitor/preferences';
@@ -124,53 +124,12 @@ const getKeys = async (): Promise<Array<string>> => vault.getKeys();
 
 const getValue = async <T>(key: string): Promise<T | undefined> => vault.getValue(key);
 const setValue = async <T>(key: string, value: T): Promise<void> => vault.setValue(key, value);
+const clear = async (): Promise<void> => vault.clear();
 
 const lock = async (): Promise<void> => vault.lock();
 const unlock = async (): Promise<void> => vault.unlock();
 
-const tokenStorage = {
-  clear(): Promise<void> {
-    return vault.clear();
-  },
-
-  getAccessToken(name?: string): Promise<string | undefined> {
-    return vault.getValue(`AccessToken${name || ''}`);
-  },
-
-  getAuthResponse(): Promise<any> {
-    return vault.getValue('AuthResponse');
-  },
-
-  async getIdToken(): Promise<string | undefined> {
-    return vault.getValue('IdToken');
-  },
-
-  getRefreshToken(): Promise<string | undefined> {
-    return vault.getValue('RefreshToken');
-  },
-
-  onLock() {
-    null;
-  },
-
-  setAccessToken(token: string, name?: string): Promise<void> {
-    return vault.setValue(`AccessToken${name || ''}`, token);
-  },
-
-  setAuthResponse(res: any): Promise<void> {
-    return vault.setValue('AuthResponse', res);
-  },
-
-  setIdToken(token: string): Promise<void> {
-    return vault.setValue('IdToken', token);
-  },
-
-  setRefreshToken(token: string): Promise<void> {
-    return vault.setValue('RefreshToken', token);
-  },
-};
-
-export default () => ({
+export const useSessionVault = () => ({
   canUnlock,
   initializeUnlockMode,
   setUnlockMode,
@@ -180,9 +139,8 @@ export default () => ({
 
   getValue,
   setValue,
+  clear,
 
   lock,
   unlock,
-
-  tokenStorage,
 });

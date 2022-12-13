@@ -56,10 +56,10 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { add } from 'ionicons/icons';
-import useVault from '@/composables/session-vault';
+import { useSessionVault } from '@/composables/session-vault';
 
 const values = ref<Array<{ key: string; value?: any }>>([]);
-const { getKeys, getValue, setValue } = useVault();
+const { getKeys, getValue, setValue } = useSessionVault();
 
 const addValue = async () => {
   const alert = await alertController.create({

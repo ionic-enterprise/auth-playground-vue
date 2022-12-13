@@ -1,4 +1,4 @@
-export default jest.fn().mockReturnValue({
+export const useAuth = jest.fn().mockReturnValue({
   login: jest.fn().mockResolvedValue(undefined),
   logout: jest.fn().mockResolvedValue(undefined),
   isAuthenticated: jest.fn().mockResolvedValue(false),
