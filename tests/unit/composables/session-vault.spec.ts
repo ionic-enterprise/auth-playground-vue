@@ -2,8 +2,8 @@ import AppPinDialog from '@/components/AppPinDialog.vue';
 import { BiometricPermissionState, Device, DeviceSecurityType, VaultType } from '@ionic-enterprise/identity-vault';
 import { modalController, isPlatform } from '@ionic/vue';
 import { Preferences } from '@capacitor/preferences';
-import useVaultFactory from '@/composables/vault-factory';
-import useSessionVault, { UnlockMode } from '@/composables/session-vault';
+import { useVaultFactory } from '@/composables/vault-factory';
+import { useSessionVault, UnlockMode } from '@/composables/session-vault';
 
 jest.mock('@capacitor/preferences');
 jest.mock('@ionic/vue', () => {
@@ -266,133 +266,11 @@ describe('useSessionVault', () => {
     });
   });
 
-  describe('token storage provider', () => {
-    describe('clear', () => {
-      it('calls the vault clear', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.clear();
-        expect(mockVault.clear).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    describe('getAccessToken', () => {
-      describe('without a token name', () => {
-        it('gets the access token using the "AccessToken" key', async () => {
-          const { tokenStorage } = useSessionVault();
-          await tokenStorage.getAccessToken();
-          expect(mockVault.getValue).toHaveBeenCalledTimes(1);
-          expect(mockVault.getValue).toHaveBeenCalledWith('AccessToken');
-        });
-
-        it('resolves the access token', async () => {
-          const { tokenStorage } = useSessionVault();
-          (mockVault.getValue as jest.Mock).mockResolvedValue('my-access-token');
-          expect(await tokenStorage.getAccessToken()).toEqual('my-access-token');
-        });
-      });
-
-      describe('with a token name', () => {
-        it('gets the access token using the "AccessToken" plus token name', async () => {
-          const { tokenStorage } = useSessionVault();
-          await tokenStorage.getAccessToken('FooBar');
-          expect(mockVault.getValue).toHaveBeenCalledTimes(1);
-          expect(mockVault.getValue).toHaveBeenCalledWith('AccessTokenFooBar');
-        });
-
-        it('resolves the access token', async () => {
-          const { tokenStorage } = useSessionVault();
-          (mockVault.getValue as jest.Mock).mockResolvedValue('my-access-token');
-          expect(await tokenStorage.getAccessToken('FooBar')).toEqual('my-access-token');
-        });
-      });
-    });
-
-    describe('getAuthResponse', () => {
-      it('gets the auth response using the "AuthResponse" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.getAuthResponse();
-        expect(mockVault.getValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.getValue).toHaveBeenCalledWith('AuthResponse');
-      });
-
-      it('resolves the auth response', async () => {
-        const { tokenStorage } = useSessionVault();
-        (mockVault.getValue as jest.Mock).mockResolvedValue({ foo: 'bar', bar: 'foo', baz: 'qux' });
-        expect(await tokenStorage.getAuthResponse()).toEqual({ foo: 'bar', bar: 'foo', baz: 'qux' });
-      });
-    });
-
-    describe('getIdToken', () => {
-      it('gets the id token using the "IdToken" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.getIdToken();
-        expect(mockVault.getValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.getValue).toHaveBeenCalledWith('IdToken');
-      });
-
-      it('resolves the id token', async () => {
-        const { tokenStorage } = useSessionVault();
-        (mockVault.getValue as jest.Mock).mockResolvedValue('my-id-token');
-        expect(await tokenStorage.getIdToken()).toEqual('my-id-token');
-      });
-    });
-
-    describe('getRefreshToken', () => {
-      it('gets the refresh token using the "RefreshToken" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.getRefreshToken();
-        expect(mockVault.getValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.getValue).toHaveBeenCalledWith('RefreshToken');
-      });
-
-      it('resolves the refresh token', async () => {
-        const { tokenStorage } = useSessionVault();
-        (mockVault.getValue as jest.Mock).mockResolvedValue('my-refresh-token');
-        expect(await tokenStorage.getRefreshToken()).toEqual('my-refresh-token');
-      });
-    });
-
-    describe('setAccessToken', () => {
-      it('sets the access token using the "AccessToken" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.setAccessToken('some-access-token');
-        expect(mockVault.setValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.setValue).toHaveBeenCalledWith('AccessToken', 'some-access-token');
-      });
-
-      it('appends the tokenName when specified', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.setAccessToken('some-access-token', 'FooBar');
-        expect(mockVault.setValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.setValue).toHaveBeenCalledWith('AccessTokenFooBar', 'some-access-token');
-      });
-    });
-
-    describe('setAuthResponse', () => {
-      it('sets the auth response using "AuthResponse" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.setAuthResponse({ foo: 'bar', baz: 'qux' });
-        expect(mockVault.setValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.setValue).toHaveBeenCalledWith('AuthResponse', { foo: 'bar', baz: 'qux' });
-      });
-    });
-
-    describe('setIdToken', () => {
-      it('sets the id token using "IdToken" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.setIdToken('some-id-token');
-        expect(mockVault.setValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.setValue).toHaveBeenCalledWith('IdToken', 'some-id-token');
-      });
-    });
-
-    describe('setRefreshToken', () => {
-      it('sets the refresh token using "RefreshToken" key', async () => {
-        const { tokenStorage } = useSessionVault();
-        await tokenStorage.setRefreshToken('some-refresh-token');
-        expect(mockVault.setValue).toHaveBeenCalledTimes(1);
-        expect(mockVault.setValue).toHaveBeenCalledWith('RefreshToken', 'some-refresh-token');
-      });
+  describe('clear', () => {
+    it('calls the vault clear', async () => {
+      const { clear } = useSessionVault();
+      await clear();
+      expect(mockVault.clear).toHaveBeenCalledTimes(1);
     });
   });
 });

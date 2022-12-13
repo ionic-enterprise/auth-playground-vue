@@ -2,8 +2,8 @@ import LoginPage from '@/views/LoginPage.vue';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import waitForExpect from 'wait-for-expect';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 import { AuthProvider } from '@/models/AuthProvider';
 import { Router } from 'vue-router';
 

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import router from '@/router';
-import useAuth from '@/composables/auth';
+import { useAuth } from '@/composables/auth';
 
 const baseURL = 'https://cs-demo-api.herokuapp.com';
 
@@ -31,7 +31,7 @@ client.interceptors.response.use(
   }
 );
 
-export default () => {
+export const useBackendAPI = () => {
   return {
     client,
   };

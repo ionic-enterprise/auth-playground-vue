@@ -46,7 +46,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/vue';
-import useTea from '@/composables/tea';
+import { useTea } from '@/composables/tea';
 import { Tea } from '@/models';
 import { computed } from 'vue';
 

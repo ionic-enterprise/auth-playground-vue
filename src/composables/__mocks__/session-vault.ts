@@ -1,4 +1,4 @@
-export default jest.fn().mockReturnValue({
+export const useSessionVault = jest.fn().mockReturnValue({
   canUnlock: jest.fn().mockResolvedValue(false),
   initializeUnlockMode: jest.fn().mockResolvedValue(undefined),
   setUnlockMode: jest.fn().mockResolvedValue(undefined),
@@ -6,17 +6,7 @@ export default jest.fn().mockReturnValue({
   getKeys: jest.fn().mockResolvedValue([]),
   getValue: jest.fn().mockResolvedValue({ value: null }),
   setValue: jest.fn().mockResolvedValue(undefined),
+  clear: jest.fn().mockResolvedValue(undefined),
   lock: jest.fn().mockResolvedValue(undefined),
   unlock: jest.fn().mockResolvedValue(undefined),
-  tokenStorage: {
-    clear: jest.fn().mockResolvedValue(undefined),
-    getAccessToken: jest.fn().mockResolvedValue(undefined),
-    getAuthResponse: jest.fn().mockResolvedValue(undefined),
-    getIdToken: jest.fn().mockResolvedValue(undefined),
-    getRefreshToken: jest.fn().mockResolvedValue(undefined),
-    setAccessToken: jest.fn().mockResolvedValue(undefined),
-    setAuthResponse: jest.fn().mockResolvedValue(undefined),
-    setIdToken: jest.fn().mockResolvedValue(undefined),
-    setRefreshToken: jest.fn().mockResolvedValue(undefined),
-  },
 });

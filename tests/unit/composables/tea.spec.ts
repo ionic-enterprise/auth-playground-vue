@@ -1,5 +1,5 @@
-import useBackendAPI from '@/composables/backend-api';
-import useTea from '@/composables/tea';
+import { useBackendAPI } from '@/composables/backend-api';
+import { useTea } from '@/composables/tea';
 import { Tea } from '@/models';
 import { GetOptions, Preferences } from '@capacitor/preferences';
 

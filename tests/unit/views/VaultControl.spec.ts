@@ -3,7 +3,7 @@ import { isPlatform } from '@ionic/vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { Device, VaultType } from '@ionic-enterprise//identity-vault';
 import VaultControlPage from '@/views/VaultControlPage.vue';
-import useSessionVault from '@/composables/session-vault';
+import { useSessionVault } from '@/composables/session-vault';
 import waitForExpect from 'wait-for-expect';
 import { Router } from 'vue-router';
 
@@ -103,10 +103,10 @@ describe('VaultControlPage.vue', () => {
 
       it('clears the vault', async () => {
         const wrapper = await mountView();
-        const { tokenStorage } = useSessionVault();
+        const { clear } = useSessionVault();
         const button = wrapper.findComponent('[data-testid="clear-vault-button"]');
         await button.trigger('click');
-        expect(tokenStorage.clear).toHaveBeenCalledTimes(1);
+        expect(clear).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -268,10 +268,10 @@ describe('VaultControlPage.vue', () => {
 
     it('clears the vault', async () => {
       const wrapper = await mountView();
-      const { tokenStorage } = useSessionVault();
+      const { clear } = useSessionVault();
       const button = wrapper.findComponent('[data-testid="clear-vault-button"]');
       await button.trigger('click');
-      expect(tokenStorage.clear).toHaveBeenCalledTimes(1);
+      expect(clear).toHaveBeenCalledTimes(1);
     });
   });
 });

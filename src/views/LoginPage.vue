@@ -89,8 +89,8 @@ import { logoAmazon, logoMicrosoft } from 'ionicons/icons';
 import { useForm, useField } from 'vee-validate';
 import { object as yupObject, string as yupString } from 'yup';
 import { AuthProvider } from '@/models';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 
 const errorMessage = ref<string>();
 

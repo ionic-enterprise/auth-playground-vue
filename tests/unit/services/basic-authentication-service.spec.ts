@@ -1,20 +1,16 @@
 import { User } from '@/models';
-import useBackendAPI from '@/composables/backend-api';
-import { BasicAuthenticationService } from '@/services/basic-authentication-service';
-import { TokenStorageProvider } from '@ionic-enterprise/auth';
+import { useBackendAPI } from '@/composables/backend-api';
+import { useSessionVault } from '@/composables/session-vault';
+import { BasicAuthenticationService } from '@/services';
 
 jest.mock('@/composables/backend-api');
+jest.mock('@/composables/session-vault');
+jest.mock('@/composables/vault-factory');
 
-describe('useAuth', () => {
-  let tokenStorageProvider: TokenStorageProvider;
+describe('Basic Authentication Service', () => {
   let authService: BasicAuthenticationService;
   beforeEach(() => {
-    tokenStorageProvider = {
-      clear: jest.fn().mockResolvedValue(undefined),
-      setAccessToken: jest.fn().mockResolvedValue(undefined),
-      getAccessToken: jest.fn().mockResolvedValue(undefined),
-    };
-    authService = new BasicAuthenticationService(tokenStorageProvider);
+    authService = new BasicAuthenticationService();
     jest.clearAllMocks();
   });
 
@@ -54,16 +50,18 @@ describe('useAuth', () => {
       });
 
       it('throws an error without setting a session', async () => {
+        const { setValue } = useSessionVault();
         expect(() => authService.login('test@test.com', 'password')).rejects.toThrow();
-        expect(tokenStorageProvider.setAccessToken).not.toHaveBeenCalled();
+        expect(setValue).not.toHaveBeenCalled();
       });
     });
 
     describe('when the login succeeds', () => {
       it('sets the session', async () => {
+        const { setValue } = useSessionVault();
         await authService.login('test@test.com', 'password');
-        expect(tokenStorageProvider.setAccessToken).toHaveBeenCalledTimes(1);
-        expect(tokenStorageProvider.setAccessToken).toHaveBeenCalledWith('123456789');
+        expect(setValue).toHaveBeenCalledTimes(1);
+        expect(setValue).toHaveBeenCalledWith('auth-token', '123456789');
       });
     });
   });
@@ -78,30 +76,37 @@ describe('useAuth', () => {
     });
 
     it('clears the session', async () => {
+      const { clear } = useSessionVault();
       await authService.logout();
-      expect(tokenStorageProvider.clear).toHaveBeenCalledTimes(1);
-      expect(tokenStorageProvider.clear).toHaveBeenCalledWith();
+      expect(clear).toHaveBeenCalledTimes(1);
+      expect(clear).toHaveBeenCalledWith();
     });
   });
 
   describe('get access token', () => {
     it('resolves the token if it exists', async () => {
-      (tokenStorageProvider.getAccessToken as jest.Mock).mockResolvedValue('88fueesli32s');
+      const { getValue } = useSessionVault();
+      (getValue as jest.Mock).mockResolvedValue('88fueesli32s');
       expect(await authService.getAccessToken()).toEqual('88fueesli32s');
     });
 
     it('resolves undefined if the token does not exist', async () => {
+      const { getValue } = useSessionVault();
+      (getValue as jest.Mock).mockResolvedValue(undefined);
       expect(await authService.getAccessToken()).toBeUndefined();
     });
   });
 
   describe('is authenticated', () => {
     it('resolves true if the token exists', async () => {
-      (tokenStorageProvider.getAccessToken as jest.Mock).mockResolvedValue('88fueesli32s');
+      const { getValue } = useSessionVault();
+      (getValue as jest.Mock).mockResolvedValue('88fueesli32s');
       expect(await authService.isAuthenticated()).toEqual(true);
     });
 
     it('resolves false if the token does not exist', async () => {
+      const { getValue } = useSessionVault();
+      (getValue as jest.Mock).mockResolvedValue(undefined);
       expect(await authService.isAuthenticated()).toEqual(false);
     });
   });

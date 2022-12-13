@@ -56,8 +56,8 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { logOutOutline } from 'ionicons/icons';
-import useAuth from '@/composables/auth';
-import useSessionVault from '@/composables/session-vault';
+import { useAuth } from '@/composables/auth';
+import { useSessionVault } from '@/composables/session-vault';
 import packageInfo from '../../package.json';
 
 const { author, name, version } = packageInfo;

@@ -7,9 +7,9 @@
 <script setup lang="ts">
 import { IonContent, IonPage } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import useVault from '@/composables/session-vault';
+import { useSessionVault } from '@/composables/session-vault';
 
-const { canUnlock } = useVault();
+const { canUnlock } = useSessionVault();
 const router = useRouter();
 
 // This strategy takes you to the login page if there is a session to be unlocked.
