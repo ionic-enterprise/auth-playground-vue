@@ -81,7 +81,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
         webView: 'private',
       },
       web: {
-        implicitLogin: 'popup',
+        uiMode: 'popup',
         authFlow: 'implicit',
       },
     });

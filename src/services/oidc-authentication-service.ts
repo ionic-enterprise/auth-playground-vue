@@ -146,7 +146,7 @@ export class OIDCAuthenticationService implements Authenticator {
         webView: 'private',
       },
       web: {
-        implicitLogin: 'popup',
+        uiMode: 'popup',
         authFlow: 'implicit',
       },
     });
