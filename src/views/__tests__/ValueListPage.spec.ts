@@ -4,14 +4,15 @@ import ValueListPage from '@/views/ValueListPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { useSessionVault } from '@/composables/session-vault';
 import { alertController } from '@ionic/vue';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/session-vault');
-jest.mock('@ionic/vue', () => {
-  const actual = jest.requireActual('@ionic/vue');
+vi.mock('@/composables/session-vault');
+vi.mock('@ionic/vue', async () => {
+  const actual = (await vi.importActual('@ionic/vue')) as any;
   return {
     ...actual,
     alertController: {
-      create: jest.fn(),
+      create: vi.fn(),
     },
   };
 });
@@ -35,8 +36,8 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 describe('ValueListPage.vue', () => {
   beforeEach(() => {
     const vault = useSessionVault();
-    (vault.getKeys as jest.Mock).mockResolvedValue([]);
-    jest.clearAllMocks();
+    (vault.getKeys as Mock).mockResolvedValue([]);
+    vi.clearAllMocks();
   });
 
   it('displays the title', async () => {
@@ -60,8 +61,8 @@ describe('ValueListPage.vue', () => {
   describe('with data', () => {
     beforeEach(() => {
       const vault = useSessionVault();
-      (vault.getKeys as jest.Mock).mockResolvedValue(['foo', 'bar', 'baz']);
-      (vault.getValue as jest.Mock).mockImplementation((key: string) => {
+      (vault.getKeys as Mock).mockResolvedValue(['foo', 'bar', 'baz']);
+      (vault.getValue as Mock).mockImplementation((key: string) => {
         return key === 'foo' ? 'cat' : key === 'bar' ? 'dog' : key === 'baz' ? 'mouse' : 'unknown';
       });
     });
@@ -83,8 +84,8 @@ describe('ValueListPage.vue', () => {
 
   describe('add value', () => {
     const alert = {
-      present: jest.fn().mockResolvedValue(undefined),
-      onDidDismiss: jest.fn().mockResolvedValue({
+      present: vi.fn().mockResolvedValue(undefined),
+      onDidDismiss: vi.fn().mockResolvedValue({
         role: 'cancel',
         data: {
           values: { key: '', value: '' },
@@ -93,7 +94,7 @@ describe('ValueListPage.vue', () => {
     };
 
     beforeEach(() => {
-      (alertController.create as jest.Mock).mockResolvedValueOnce(alert);
+      (alertController.create as Mock).mockResolvedValueOnce(alert);
     });
 
     it('creates and presents an alert', async () => {
@@ -158,8 +159,8 @@ describe('ValueListPage.vue', () => {
 
       it('refreshes the item in the list', async () => {
         const vault = useSessionVault();
-        (vault.getKeys as jest.Mock).mockResolvedValue(['bar', 'baz']);
-        (vault.getValue as jest.Mock).mockImplementation((key: string) => {
+        (vault.getKeys as Mock).mockResolvedValue(['bar', 'baz']);
+        (vault.getValue as Mock).mockImplementation((key: string) => {
           return key === 'bar' ? 'dog' : key === 'baz' ? 'mouse' : 'unknown';
         });
         const wrapper = await mountView();
@@ -168,8 +169,8 @@ describe('ValueListPage.vue', () => {
         let items = list.findAllComponents('ion-item');
         expect(items.length).toEqual(2);
         const button = wrapper.findComponent('[data-testid="add-value-button"]');
-        (vault.getKeys as jest.Mock).mockResolvedValue(['bar', 'baz', 'foo']);
-        (vault.getValue as jest.Mock).mockImplementation((key: string) => {
+        (vault.getKeys as Mock).mockResolvedValue(['bar', 'baz', 'foo']);
+        (vault.getValue as Mock).mockImplementation((key: string) => {
           return key === 'bar' ? 'dog' : key === 'baz' ? 'mouse' : key === 'foo' ? 'to the bar' : 'unknown';
         });
         await button.trigger('click');

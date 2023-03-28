@@ -4,9 +4,10 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { useAuth } from '@/composables/auth';
 import { useSessionVault } from '@/composables/session-vault';
 import { Router } from 'vue-router';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/auth');
-jest.mock('@/composables/session-vault');
+vi.mock('@/composables/auth');
+vi.mock('@/composables/session-vault');
 
 let router: Router;
 const mountView = async (): Promise<VueWrapper<any>> => {
@@ -16,7 +17,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
   });
   router.push('/');
   await router.isReady();
-  router.replace = jest.fn().mockResolvedValue(undefined);
+  router.replace = vi.fn().mockResolvedValue(undefined);
   return mount(UnlockPage, {
     global: {
       plugins: [router],
@@ -26,7 +27,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 
 describe('UnlockPage.vue', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('displays an unlock prompt', async () => {
@@ -45,7 +46,7 @@ describe('UnlockPage.vue', () => {
     describe('while the user can unlock', () => {
       beforeEach(() => {
         const { canUnlock } = useSessionVault();
-        (canUnlock as jest.Mock).mockResolvedValue(true);
+        (canUnlock as Mock).mockResolvedValue(true);
       });
 
       it('unlocks the vault', async () => {
@@ -69,7 +70,7 @@ describe('UnlockPage.vue', () => {
       describe('when the user cancels', () => {
         it('does not navigate', async () => {
           const { unlock } = useSessionVault();
-          (unlock as jest.Mock).mockRejectedValue(new Error('whatever, dude'));
+          (unlock as Mock).mockRejectedValue(new Error('whatever, dude'));
           const wrapper = await mountView();
           const button = wrapper.find('[data-testid="unlock-button"]');
           await button.trigger('click');
@@ -82,7 +83,7 @@ describe('UnlockPage.vue', () => {
     describe('when the user can no longer unlock', () => {
       beforeEach(() => {
         const { canUnlock } = useSessionVault();
-        (canUnlock as jest.Mock).mockResolvedValue(false);
+        (canUnlock as Mock).mockResolvedValue(false);
       });
 
       it('unlocks the vault', async () => {

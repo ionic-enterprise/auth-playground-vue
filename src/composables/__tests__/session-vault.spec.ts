@@ -4,13 +4,14 @@ import { modalController, isPlatform } from '@ionic/vue';
 import { Preferences } from '@capacitor/preferences';
 import { useVaultFactory } from '@/composables/vault-factory';
 import { useSessionVault, UnlockMode } from '@/composables/session-vault';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@capacitor/preferences');
-jest.mock('@ionic/vue', () => {
-  const actual = jest.requireActual('@ionic/vue');
-  return { ...actual, isPlatform: jest.fn() };
+vi.mock('@capacitor/preferences');
+vi.mock('@ionic/vue', async () => {
+  const actual = (await vi.importActual('@ionic/vue')) as any;
+  return { ...actual, isPlatform: vi.fn() };
 });
-jest.mock('@/composables/vault-factory');
+vi.mock('@/composables/vault-factory');
 
 describe('useSessionVault', () => {
   const { createVault } = useVaultFactory();
@@ -23,19 +24,19 @@ describe('useSessionVault', () => {
     customPasscodeInvalidUnlockAttempts: 2,
     unlockVaultOnLoad: false,
   });
-  const onPasscodeRequestedCallback = (mockVault.onPasscodeRequested as jest.Mock).mock.calls[0][0];
+  const onPasscodeRequestedCallback = (mockVault.onPasscodeRequested as Mock).mock.calls[0][0];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
   describe('setUnlockMode', () => {
     describe('Device security', () => {
       beforeEach(() => {
-        Device.showBiometricPrompt = jest.fn();
+        Device.showBiometricPrompt = vi.fn();
       });
 
       it('shows a bio prompt if provisioning the permission is required', async () => {
-        Device.isBiometricsAllowed = jest.fn().mockResolvedValue(BiometricPermissionState.Prompt);
+        Device.isBiometricsAllowed = vi.fn().mockResolvedValue(BiometricPermissionState.Prompt);
         const { setUnlockMode } = useSessionVault();
         await setUnlockMode('Device');
         expect(Device.showBiometricPrompt).toHaveBeenCalledTimes(1);
@@ -45,14 +46,14 @@ describe('useSessionVault', () => {
       });
 
       it('does not show a bio prompt if the permission has already been granted', async () => {
-        Device.isBiometricsAllowed = jest.fn().mockResolvedValue(BiometricPermissionState.Granted);
+        Device.isBiometricsAllowed = vi.fn().mockResolvedValue(BiometricPermissionState.Granted);
         const { setUnlockMode } = useSessionVault();
         await setUnlockMode('Device');
         expect(Device.showBiometricPrompt).not.toHaveBeenCalled();
       });
 
       it('does not show a bio prompt if the permission has already been denied', async () => {
-        Device.isBiometricsAllowed = jest.fn().mockResolvedValue(BiometricPermissionState.Denied);
+        Device.isBiometricsAllowed = vi.fn().mockResolvedValue(BiometricPermissionState.Denied);
         const { setUnlockMode } = useSessionVault();
         await setUnlockMode('Device');
         expect(Device.showBiometricPrompt).not.toHaveBeenCalled();
@@ -86,11 +87,11 @@ describe('useSessionVault', () => {
   describe('initialize unlock type', () => {
     describe('on mobile', () => {
       beforeEach(() => {
-        (isPlatform as jest.Mock).mockReturnValue(true);
+        (isPlatform as Mock).mockReturnValue(true);
       });
 
       it('uses a session PIN if no system PIN is set', async () => {
-        Device.isSystemPasscodeSet = jest.fn().mockResolvedValue(false);
+        Device.isSystemPasscodeSet = vi.fn().mockResolvedValue(false);
         const expectedConfig = {
           ...mockVault.config,
           type: VaultType.CustomPasscode,
@@ -103,8 +104,8 @@ describe('useSessionVault', () => {
       });
 
       it('uses device security if a system PIN is set and biometrics is enabled', async () => {
-        Device.isSystemPasscodeSet = jest.fn().mockResolvedValue(true);
-        Device.isBiometricsEnabled = jest.fn().mockResolvedValue(true);
+        Device.isSystemPasscodeSet = vi.fn().mockResolvedValue(true);
+        Device.isBiometricsEnabled = vi.fn().mockResolvedValue(true);
         const expectedConfig = {
           ...mockVault.config,
           type: VaultType.DeviceSecurity,
@@ -117,8 +118,8 @@ describe('useSessionVault', () => {
       });
 
       it('uses system PIN if a system PIN is set and biometrics is not enabled', async () => {
-        Device.isSystemPasscodeSet = jest.fn().mockResolvedValue(true);
-        Device.isBiometricsEnabled = jest.fn().mockResolvedValue(false);
+        Device.isSystemPasscodeSet = vi.fn().mockResolvedValue(true);
+        Device.isBiometricsEnabled = vi.fn().mockResolvedValue(false);
         const expectedConfig = {
           ...mockVault.config,
           type: VaultType.DeviceSecurity,
@@ -133,7 +134,7 @@ describe('useSessionVault', () => {
 
     describe('on web', () => {
       beforeEach(() => {
-        (isPlatform as jest.Mock).mockReturnValue(false);
+        (isPlatform as Mock).mockReturnValue(false);
       });
 
       it('uses secure storage', async () => {
@@ -167,9 +168,9 @@ describe('useSessionVault', () => {
     ])(
       'is %s for %s, empty: %s, locked: %s',
       async (expected: boolean, mode: UnlockMode, empty: boolean, locked: boolean) => {
-        (mockVault.isEmpty as jest.Mock).mockResolvedValue(empty);
-        (mockVault.isLocked as jest.Mock).mockResolvedValue(locked);
-        (Preferences.get as jest.Mock).mockResolvedValue({ value: mode });
+        (mockVault.isEmpty as Mock).mockResolvedValue(empty);
+        (mockVault.isLocked as Mock).mockResolvedValue(locked);
+        (Preferences.get as Mock).mockResolvedValue({ value: mode });
         const { canUnlock } = useSessionVault();
         expect(await canUnlock()).toBe(expected);
       }
@@ -180,10 +181,10 @@ describe('useSessionVault', () => {
     let modal: { onDidDismiss: () => Promise<any>; present: () => Promise<void> };
     beforeEach(async () => {
       modal = {
-        onDidDismiss: jest.fn().mockResolvedValue({ role: 'cancel' }),
-        present: jest.fn().mockResolvedValue(undefined),
+        onDidDismiss: vi.fn().mockResolvedValue({ role: 'cancel' }),
+        present: vi.fn().mockResolvedValue(undefined),
       };
-      modalController.create = jest.fn().mockResolvedValue(modal);
+      modalController.create = vi.fn().mockResolvedValue(modal);
     });
 
     it.each([[true], [false]])('creates a PIN dialog, setting passcode: %s', async (setPasscode: boolean) => {
@@ -204,7 +205,7 @@ describe('useSessionVault', () => {
     });
 
     it('sets the custom passcode to the PIN', async () => {
-      (modal.onDidDismiss as jest.Mock).mockResolvedValue({ data: '4203', role: 'OK' });
+      (modal.onDidDismiss as Mock).mockResolvedValue({ data: '4203', role: 'OK' });
       await onPasscodeRequestedCallback(false);
       expect(mockVault.setCustomPasscode).toHaveBeenCalledTimes(1);
       expect(mockVault.setCustomPasscode).toHaveBeenCalledWith('4203');

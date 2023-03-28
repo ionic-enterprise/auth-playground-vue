@@ -14,7 +14,7 @@ Once the access is set up, the build processes is the same as for most Ionic app
 
 - `npm install`
 - `npm run build`
-- to start a development server: `npm run serve`
+- to start a development server: `npm run dev`
 - to run on an Android device: `ionic cap run android`
 - to run on an iOS device: `ionic cap run ios` (you may need to run `ionic cap start ios` and update the development team)
 

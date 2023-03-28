@@ -1,6 +1,7 @@
 import AppPinDialog from '@/components/AppPinDialog.vue';
 import { modalController } from '@ionic/vue';
 import { mount, VueWrapper } from '@vue/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('AppPinDialog', () => {
   const createComponent = (setPasscodeMode = false): VueWrapper<any> => {
@@ -67,7 +68,7 @@ describe('AppPinDialog', () => {
 
     describe('cancel button', () => {
       it('does not exist', async () => {
-        modalController.dismiss = jest.fn();
+        modalController.dismiss = vi.fn();
         const cancel = wrapper.find('[data-testid="cancel-button"]');
         expect(cancel.exists()).toBe(false);
       });
@@ -90,7 +91,7 @@ describe('AppPinDialog', () => {
       });
 
       it('dismissing when entered PINs match', async () => {
-        modalController.dismiss = jest.fn();
+        modalController.dismiss = vi.fn();
         const enterButton = wrapper.find('[data-testid="enter-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');
         await buttons[0].trigger('click');
@@ -109,7 +110,7 @@ describe('AppPinDialog', () => {
       });
 
       it('provides an error when the PINs do not match', async () => {
-        modalController.dismiss = jest.fn();
+        modalController.dismiss = vi.fn();
         const enterButton = wrapper.find('[data-testid="enter-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');
         const errorMsg = wrapper.find('[data-testid="error-message"]');
@@ -186,7 +187,7 @@ describe('AppPinDialog', () => {
 
     describe('presssing the cancel button', () => {
       it('closes the modal', async () => {
-        modalController.dismiss = jest.fn();
+        modalController.dismiss = vi.fn();
         const cancel = wrapper.find('[data-testid="cancel-button"]');
         await cancel.trigger('click');
         expect(modalController.dismiss).toHaveBeenCalledTimes(1);
@@ -194,7 +195,7 @@ describe('AppPinDialog', () => {
       });
 
       it('ignores entered data', async () => {
-        modalController.dismiss = jest.fn();
+        modalController.dismiss = vi.fn();
         const cancel = wrapper.find('[data-testid="cancel-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');
         await buttons[0].trigger('click');
@@ -209,7 +210,7 @@ describe('AppPinDialog', () => {
 
     describe('pressing enter', () => {
       it('closes the modal passing back the pin', async () => {
-        modalController.dismiss = jest.fn();
+        modalController.dismiss = vi.fn();
         const pin = wrapper.find('[data-testid="display-pin"]');
         const enterButton = wrapper.find('[data-testid="enter-button"]');
         const buttons = wrapper.findAll('[data-testclass="number-button"]');

@@ -1,16 +1,17 @@
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { isPlatform } from '@ionic/vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-import { Device, VaultType } from '@ionic-enterprise//identity-vault';
+import { Device, VaultType } from '@ionic-enterprise/identity-vault';
 import VaultControlPage from '@/views/VaultControlPage.vue';
 import { useSessionVault } from '@/composables/session-vault';
 import waitForExpect from 'wait-for-expect';
 import { Router } from 'vue-router';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/session-vault');
-jest.mock('@ionic/vue', () => {
-  const actual = jest.requireActual('@ionic/vue');
-  return { ...actual, isPlatform: jest.fn() };
+vi.mock('@/composables/session-vault');
+vi.mock('@ionic/vue', async () => {
+  const actual = (await vi.importActual('@ionic/vue')) as any;
+  return { ...actual, isPlatform: vi.fn() };
 });
 
 describe('VaultControlPage.vue', () => {
@@ -23,7 +24,7 @@ describe('VaultControlPage.vue', () => {
     });
     router.push('/');
     await router.isReady();
-    router.push = jest.fn();
+    router.push = vi.fn();
     return mount(VaultControlPage, {
       global: {
         plugins: [router],
@@ -32,7 +33,7 @@ describe('VaultControlPage.vue', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('displays the title', async () => {
@@ -45,7 +46,7 @@ describe('VaultControlPage.vue', () => {
 
   describe('on web', () => {
     beforeEach(() => {
-      (isPlatform as jest.Mock).mockReturnValue(false);
+      (isPlatform as Mock).mockReturnValue(false);
     });
 
     describe('use biometrics button', () => {
@@ -113,9 +114,9 @@ describe('VaultControlPage.vue', () => {
 
   describe('on mobile', () => {
     beforeEach(() => {
-      (isPlatform as jest.Mock).mockReturnValue(true);
-      Device.isSystemPasscodeSet = jest.fn().mockResolvedValue(true);
-      Device.isBiometricsEnabled = jest.fn().mockResolvedValue(true);
+      (isPlatform as Mock).mockReturnValue(true);
+      Device.isSystemPasscodeSet = vi.fn().mockResolvedValue(true);
+      Device.isBiometricsEnabled = vi.fn().mockResolvedValue(true);
     });
 
     describe('use biometrics button', () => {
@@ -127,7 +128,7 @@ describe('VaultControlPage.vue', () => {
       });
 
       it('is disabled if biometrics is not enabled', async () => {
-        Device.isBiometricsEnabled = jest.fn().mockResolvedValue(false);
+        Device.isBiometricsEnabled = vi.fn().mockResolvedValue(false);
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="use-device-button"]');
         await flushPromises();
@@ -153,7 +154,7 @@ describe('VaultControlPage.vue', () => {
       });
 
       it('is disabled if the system passcode is not set', async () => {
-        Device.isSystemPasscodeSet = jest.fn().mockResolvedValue(false);
+        Device.isSystemPasscodeSet = vi.fn().mockResolvedValue(false);
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="use-system-passcode-button"]');
         await flushPromises();
@@ -216,7 +217,7 @@ describe('VaultControlPage.vue', () => {
 
       it('is disabled if the vault type is secure storage', async () => {
         const { getConfig } = useSessionVault();
-        (getConfig as jest.Mock).mockReturnValueOnce({ type: VaultType.SecureStorage });
+        (getConfig as Mock).mockReturnValueOnce({ type: VaultType.SecureStorage });
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="lock-vault-button"]');
         await flushPromises();

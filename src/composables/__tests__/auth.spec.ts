@@ -2,17 +2,18 @@ import { useAuth } from '@/composables/auth';
 import { AuthProvider } from '@/models';
 import { BasicAuthenticationService, OIDCAuthenticationService } from '@/services';
 import { Preferences } from '@capacitor/preferences';
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/session-vault');
-jest.mock('@/composables/vault-factory');
-jest.mock('@capacitor/preferences');
-jest.mock('@/services/basic-authentication-service');
-jest.mock('@/services/oidc-authentication-service');
+vi.mock('@/composables/session-vault');
+vi.mock('@/composables/vault-factory');
+vi.mock('@capacitor/preferences');
+vi.mock('@/services/basic-authentication-service');
+vi.mock('@/services/oidc-authentication-service');
 
 describe('auth', () => {
   beforeEach(() => {
-    (Preferences.get as jest.Mock).mockResolvedValue({ value: undefined });
-    jest.resetAllMocks();
+    (Preferences.get as Mock).mockResolvedValue({ value: undefined });
+    vi.resetAllMocks();
   });
 
   afterEach(async () => {
@@ -23,7 +24,7 @@ describe('auth', () => {
   let mockBasicAuth: BasicAuthenticationService;
   const getMockBasicAuth = (): BasicAuthenticationService => {
     if (!mockBasicAuth) {
-      mockBasicAuth = (BasicAuthenticationService as jest.Mock).mock.instances[0];
+      mockBasicAuth = (BasicAuthenticationService as Mock).mock.instances[0];
     }
     return mockBasicAuth;
   };
@@ -31,7 +32,7 @@ describe('auth', () => {
   let mockOIDCAuth: OIDCAuthenticationService;
   const getMockOIDCAuth = (): OIDCAuthenticationService => {
     if (!mockOIDCAuth) {
-      mockOIDCAuth = (OIDCAuthenticationService as jest.Mock).mock.instances[0];
+      mockOIDCAuth = (OIDCAuthenticationService as Mock).mock.instances[0];
     }
     return mockOIDCAuth;
   };
@@ -96,7 +97,7 @@ describe('auth', () => {
 
       describe('with a previously set provider', () => {
         beforeEach(() => {
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: provider });
+          (Preferences.get as Mock).mockResolvedValue({ value: provider });
         });
 
         it('gets the current provider', async () => {
@@ -126,7 +127,7 @@ describe('auth', () => {
 
       describe('without a previously set provider', () => {
         beforeEach(() => {
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: undefined });
+          (Preferences.get as Mock).mockResolvedValue({ value: undefined });
         });
         it('gets the current provider', async () => {
           const { logout } = useAuth();
@@ -152,7 +153,7 @@ describe('auth', () => {
             provider === 'Basic' ? 'test@testy.com' : undefined,
             provider === 'Basic' ? 'passw0rd' : undefined
           );
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: provider });
+          (Preferences.get as Mock).mockResolvedValue({ value: provider });
         });
 
         it('does not get the current provider', async () => {
@@ -163,7 +164,7 @@ describe('auth', () => {
 
         it('does not construct a service', async () => {
           const { logout } = useAuth();
-          jest.clearAllMocks();
+          vi.clearAllMocks();
           await logout();
           expect(BasicAuthenticationService).not.toHaveBeenCalled();
           expect(OIDCAuthenticationService).not.toHaveBeenCalled();
@@ -180,15 +181,15 @@ describe('auth', () => {
         const { isAuthenticated } = useAuth();
         await isAuthenticated(); // prime the pump if need be
         const mockAuth = provider === 'Basic' ? getMockBasicAuth() : getMockOIDCAuth();
-        (mockAuth.isAuthenticated as jest.Mock).mockResolvedValue(true);
+        (mockAuth.isAuthenticated as Mock).mockResolvedValue(true);
         expect(await isAuthenticated()).toBe(true);
-        (mockAuth.isAuthenticated as jest.Mock).mockResolvedValue(false);
+        (mockAuth.isAuthenticated as Mock).mockResolvedValue(false);
         expect(await isAuthenticated()).toBe(false);
       };
 
       describe('with a previously set provider', () => {
         beforeEach(() => {
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: provider });
+          (Preferences.get as Mock).mockResolvedValue({ value: provider });
         });
 
         it('gets the current provider', async () => {
@@ -218,7 +219,7 @@ describe('auth', () => {
 
       describe('without a previously set provider', () => {
         beforeEach(() => {
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: undefined });
+          (Preferences.get as Mock).mockResolvedValue({ value: undefined });
         });
         it('gets the current provider', async () => {
           const { isAuthenticated } = useAuth();
@@ -249,7 +250,7 @@ describe('auth', () => {
             provider === 'Basic' ? 'test@testy.com' : undefined,
             provider === 'Basic' ? 'passw0rd' : undefined
           );
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: provider });
+          (Preferences.get as Mock).mockResolvedValue({ value: provider });
         });
 
         it('does not get the current provider', async () => {
@@ -260,7 +261,7 @@ describe('auth', () => {
 
         const { isAuthenticated } = useAuth();
         it('does not construct a service', async () => {
-          jest.clearAllMocks();
+          vi.clearAllMocks();
           await isAuthenticated();
           expect(BasicAuthenticationService).not.toHaveBeenCalled();
           expect(OIDCAuthenticationService).not.toHaveBeenCalled();
@@ -277,15 +278,15 @@ describe('auth', () => {
         const { getAccessToken } = useAuth();
         await getAccessToken(); // prime the pump if need be
         const mockAuth = provider === 'Basic' ? getMockBasicAuth() : getMockOIDCAuth();
-        (mockAuth.getAccessToken as jest.Mock).mockResolvedValue('thisIsAToken');
+        (mockAuth.getAccessToken as Mock).mockResolvedValue('thisIsAToken');
         expect(await getAccessToken()).toEqual('thisIsAToken');
-        (mockAuth.getAccessToken as jest.Mock).mockResolvedValue('thisIsADifferentToken');
+        (mockAuth.getAccessToken as Mock).mockResolvedValue('thisIsADifferentToken');
         expect(await getAccessToken()).toBe('thisIsADifferentToken');
       };
 
       describe('with a previously set provider', () => {
         beforeEach(() => {
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: provider });
+          (Preferences.get as Mock).mockResolvedValue({ value: provider });
         });
 
         it('gets the current provider', async () => {
@@ -315,7 +316,7 @@ describe('auth', () => {
 
       describe('without a previously set provider', () => {
         beforeEach(() => {
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: undefined });
+          (Preferences.get as Mock).mockResolvedValue({ value: undefined });
         });
         it('gets the current provider', async () => {
           const { getAccessToken } = useAuth();
@@ -345,7 +346,7 @@ describe('auth', () => {
             provider === 'Basic' ? 'test@testy.com' : undefined,
             provider === 'Basic' ? 'passw0rd' : undefined
           );
-          (Preferences.get as jest.Mock).mockResolvedValue({ value: provider });
+          (Preferences.get as Mock).mockResolvedValue({ value: provider });
         });
 
         it('does not get the current provider', async () => {
@@ -356,7 +357,7 @@ describe('auth', () => {
 
         const { getAccessToken } = useAuth();
         it('does not construct a service', async () => {
-          jest.clearAllMocks();
+          vi.clearAllMocks();
           await getAccessToken();
           expect(BasicAuthenticationService).not.toHaveBeenCalled();
           expect(OIDCAuthenticationService).not.toHaveBeenCalled();

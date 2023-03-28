@@ -6,9 +6,10 @@ import { useAuth } from '@/composables/auth';
 import { useSessionVault } from '@/composables/session-vault';
 import { AuthProvider } from '@/models/AuthProvider';
 import { Router } from 'vue-router';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/auth');
-jest.mock('@/composables/session-vault');
+vi.mock('@/composables/auth');
+vi.mock('@/composables/session-vault');
 
 describe('LoginPage.vue', () => {
   let router: Router;
@@ -28,7 +29,7 @@ describe('LoginPage.vue', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('displays messages as the user enters invalid data', async () => {
@@ -123,7 +124,7 @@ describe('LoginPage.vue', () => {
 
       it('navigates to the root page', async () => {
         const button = wrapper.find('[data-testid="basic-signin-button"]');
-        router.replace = jest.fn();
+        router.replace = vi.fn();
         await button.trigger('click');
         await flushPromises();
         expect(router.replace).toHaveBeenCalledTimes(1);
@@ -134,7 +135,7 @@ describe('LoginPage.vue', () => {
     describe('if the login fails', () => {
       beforeEach(() => {
         const { login } = useAuth();
-        (login as jest.Mock).mockRejectedValue(new Error('the login failed'));
+        (login as Mock).mockRejectedValue(new Error('the login failed'));
       });
 
       it('does not initialize the vault unlock mode', async () => {
@@ -154,7 +155,7 @@ describe('LoginPage.vue', () => {
 
       it('does not navigate', async () => {
         const button = wrapper.find('[data-testid="basic-signin-button"]');
-        router.replace = jest.fn();
+        router.replace = vi.fn();
         button.trigger('click');
         await flushPromises();
         expect(router.replace).not.toHaveBeenCalled();
@@ -182,7 +183,7 @@ describe('LoginPage.vue', () => {
       beforeEach(async () => {
         const { login } = useAuth();
         wrapper = await mountView();
-        (login as jest.Mock).mockResolvedValue(undefined);
+        (login as Mock).mockResolvedValue(undefined);
       });
 
       it('performs the login', async () => {
@@ -205,7 +206,7 @@ describe('LoginPage.vue', () => {
 
         it('navigates to the root page', async () => {
           const button = getButton();
-          router.replace = jest.fn();
+          router.replace = vi.fn();
           button.trigger('click');
           await flushPromises();
           expect(router.replace).toHaveBeenCalledTimes(1);
@@ -216,7 +217,7 @@ describe('LoginPage.vue', () => {
       describe('if the login fails', () => {
         beforeEach(() => {
           const { login } = useAuth();
-          (login as jest.Mock).mockRejectedValue(new Error('the login failed'));
+          (login as Mock).mockRejectedValue(new Error('the login failed'));
         });
 
         it('shows an error', async () => {
@@ -229,7 +230,7 @@ describe('LoginPage.vue', () => {
 
         it('does not navigate', async () => {
           const button = getButton();
-          router.replace = jest.fn();
+          router.replace = vi.fn();
           button.trigger('click');
           await flushPromises();
           expect(router.replace).not.toHaveBeenCalled();

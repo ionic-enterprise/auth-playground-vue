@@ -3,8 +3,9 @@ import StartPage from '@/views/StartPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { useSessionVault } from '@/composables/session-vault';
 import { Router } from 'vue-router';
+import { describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/session-vault');
+vi.mock('@/composables/session-vault');
 
 let router: Router;
 
@@ -15,7 +16,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
   });
   router.push('/');
   await router.isReady();
-  router.replace = jest.fn();
+  router.replace = vi.fn();
   return mount(StartPage, {
     global: {
       plugins: [router],
@@ -26,7 +27,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 describe('StartPage.vue', () => {
   it('routes to the teas when we cannot unlock', async () => {
     const { canUnlock } = useSessionVault();
-    (canUnlock as jest.Mock).mockResolvedValue(false);
+    (canUnlock as Mock).mockResolvedValue(false);
     await mountView();
     await flushPromises();
     expect(router.replace).toHaveBeenCalledTimes(1);
@@ -35,7 +36,7 @@ describe('StartPage.vue', () => {
 
   it('routes to the unlock page when we can unlock', async () => {
     const { canUnlock } = useSessionVault();
-    (canUnlock as jest.Mock).mockResolvedValue(true);
+    (canUnlock as Mock).mockResolvedValue(true);
     await mountView();
     await flushPromises();
     expect(router.replace).toHaveBeenCalledTimes(1);

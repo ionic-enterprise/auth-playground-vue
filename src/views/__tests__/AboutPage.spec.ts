@@ -4,9 +4,10 @@ import AboutPage from '@/views/AboutPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { useAuth } from '@/composables/auth';
 import { useSessionVault } from '@/composables/session-vault';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-jest.mock('@/composables/auth');
-jest.mock('@/composables/session-vault');
+vi.mock('@/composables/auth');
+vi.mock('@/composables/session-vault');
 
 let router: Router;
 
@@ -26,7 +27,7 @@ const mountView = async (): Promise<VueWrapper<any>> => {
 
 describe('AboutPage.vue', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('displays the title', async () => {
@@ -41,7 +42,7 @@ describe('AboutPage.vue', () => {
       const { setUnlockMode } = useSessionVault();
       const wrapper = await mountView();
       const button = wrapper.find('[data-testid="logout-button"]');
-      router.replace = jest.fn();
+      router.replace = vi.fn();
       await button.trigger('click');
       await flushPromises();
       expect(setUnlockMode).toHaveBeenCalledTimes(1);
@@ -52,7 +53,7 @@ describe('AboutPage.vue', () => {
       const { logout } = useAuth();
       const wrapper = await mountView();
       const button = wrapper.find('[data-testid="logout-button"]');
-      router.replace = jest.fn();
+      router.replace = vi.fn();
       await button.trigger('click');
       expect(logout).toHaveBeenCalledTimes(1);
     });
@@ -60,7 +61,7 @@ describe('AboutPage.vue', () => {
     it('navigates to the login route', async () => {
       const wrapper = await mountView();
       const button = wrapper.find('[data-testid="logout-button"]');
-      router.replace = jest.fn();
+      router.replace = vi.fn();
       await button.trigger('click');
       await flushPromises();
       expect(router.replace).toHaveBeenCalledTimes(1);

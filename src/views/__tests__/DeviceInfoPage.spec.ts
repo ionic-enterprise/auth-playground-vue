@@ -10,13 +10,14 @@ import {
 } from '@ionic-enterprise/identity-vault';
 import { alertController, isPlatform } from '@ionic/vue';
 import waitForExpect from 'wait-for-expect';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/auth');
-jest.mock('@/composables/session-vault');
-jest.mock('@ionic-enterprise/identity-vault');
-jest.mock('@ionic/vue', () => {
-  const actual = jest.requireActual('@ionic/vue');
-  return { ...actual, isPlatform: jest.fn(), alertController: { create: jest.fn() } };
+vi.mock('@/composables/auth');
+vi.mock('@/composables/session-vault');
+vi.mock('@ionic-enterprise/identity-vault');
+vi.mock('@ionic/vue', async () => {
+  const actual = (await vi.importActual('@ionic/vue')) as any;
+  return { ...actual, isPlatform: vi.fn(), alertController: { create: vi.fn() } };
 });
 
 let router: Router;
@@ -28,25 +29,27 @@ const mountView = async (): Promise<VueWrapper<any>> => {
   });
   router.push('/');
   await router.isReady();
-  return mount(DeviceInfoPage, {
+  const view = mount(DeviceInfoPage, {
     global: {
       plugins: [router],
     },
   });
+  await flushPromises();
+  return view;
 };
 
 describe('DeviceInfoPage.vue', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (Device.hasSecureHardware as jest.Mock).mockResolvedValue(false);
-    (Device.isBiometricsSupported as jest.Mock).mockResolvedValue(false);
-    (Device.isBiometricsEnabled as jest.Mock).mockResolvedValue(false);
-    (Device.isBiometricsAllowed as jest.Mock).mockResolvedValue(BiometricPermissionState.Denied);
-    (Device.getBiometricStrengthLevel as jest.Mock).mockResolvedValue(BiometricSecurityStrength.Weak);
-    (Device.isSystemPasscodeSet as jest.Mock).mockResolvedValue(false);
-    (Device.isHideScreenOnBackgroundEnabled as jest.Mock).mockResolvedValue(false);
-    (Device.isLockedOutOfBiometrics as jest.Mock).mockResolvedValue(false);
-    (Device.getAvailableHardware as jest.Mock).mockResolvedValue([]);
+    vi.clearAllMocks();
+    (Device.hasSecureHardware as Mock).mockResolvedValue(false);
+    (Device.isBiometricsSupported as Mock).mockResolvedValue(false);
+    (Device.isBiometricsEnabled as Mock).mockResolvedValue(false);
+    (Device.isBiometricsAllowed as Mock).mockResolvedValue(BiometricPermissionState.Denied);
+    (Device.getBiometricStrengthLevel as Mock).mockResolvedValue(BiometricSecurityStrength.Weak);
+    (Device.isSystemPasscodeSet as Mock).mockResolvedValue(false);
+    (Device.isHideScreenOnBackgroundEnabled as Mock).mockResolvedValue(false);
+    (Device.isLockedOutOfBiometrics as Mock).mockResolvedValue(false);
+    (Device.getAvailableHardware as Mock).mockResolvedValue([]);
   });
 
   it('displays the title', async () => {
@@ -58,7 +61,7 @@ describe('DeviceInfoPage.vue', () => {
   });
 
   it.each([[true], [false]])('has secure hardware displays %s', async (value: boolean) => {
-    (Device.hasSecureHardware as jest.Mock).mockResolvedValue(value);
+    (Device.hasSecureHardware as Mock).mockResolvedValue(value);
     const wrapper = await mountView();
     const item = wrapper.findComponent('[data-testid="has-secure-hardware"]');
     const note = item.findComponent('ion-note');
@@ -66,7 +69,7 @@ describe('DeviceInfoPage.vue', () => {
   });
 
   it.each([[true], [false]])('biometrics supported displays %s', async (value: boolean) => {
-    (Device.isBiometricsSupported as jest.Mock).mockResolvedValue(value);
+    (Device.isBiometricsSupported as Mock).mockResolvedValue(value);
     const wrapper = await mountView();
     const item = wrapper.findComponent('[data-testid="biometrics-supported"]');
     const note = item.findComponent('ion-note');
@@ -74,7 +77,7 @@ describe('DeviceInfoPage.vue', () => {
   });
 
   it.each([[true], [false]])('biometrics enabled displays %s', async (value: boolean) => {
-    (Device.isBiometricsEnabled as jest.Mock).mockResolvedValue(value);
+    (Device.isBiometricsEnabled as Mock).mockResolvedValue(value);
     const wrapper = await mountView();
     const item = wrapper.findComponent('[data-testid="biometrics-enabled"]');
     const note = item.findComponent('ion-note');
@@ -84,7 +87,7 @@ describe('DeviceInfoPage.vue', () => {
   it.each([[BiometricPermissionState.Denied], [BiometricPermissionState.Prompt], [BiometricPermissionState.Granted]])(
     'biometrics allowed displays %s',
     async (value: BiometricPermissionState) => {
-      (Device.isBiometricsAllowed as jest.Mock).mockResolvedValue(value);
+      (Device.isBiometricsAllowed as Mock).mockResolvedValue(value);
       const wrapper = await mountView();
       const item = wrapper.findComponent('[data-testid="biometrics-allowed"]');
       const note = item.findComponent('ion-note');
@@ -95,7 +98,7 @@ describe('DeviceInfoPage.vue', () => {
   it.each([[BiometricSecurityStrength.Weak], [BiometricSecurityStrength.Strong]])(
     'biometrics allowed displays %s',
     async (value: BiometricSecurityStrength) => {
-      (Device.getBiometricStrengthLevel as jest.Mock).mockResolvedValue(value);
+      (Device.getBiometricStrengthLevel as Mock).mockResolvedValue(value);
       const wrapper = await mountView();
       const item = wrapper.findComponent('[data-testid="biometric-security-strength"]');
       const note = item.findComponent('ion-note');
@@ -104,7 +107,7 @@ describe('DeviceInfoPage.vue', () => {
   );
 
   it.each([[true], [false]])('system passcode displays %s', async (value: boolean) => {
-    (Device.isSystemPasscodeSet as jest.Mock).mockResolvedValue(value);
+    (Device.isSystemPasscodeSet as Mock).mockResolvedValue(value);
     const wrapper = await mountView();
     const item = wrapper.findComponent('[data-testid="system-passcode"]');
     const note = item.findComponent('ion-note');
@@ -112,7 +115,7 @@ describe('DeviceInfoPage.vue', () => {
   });
 
   it.each([[true], [false]])('privacy screen displays %s', async (value: boolean) => {
-    (Device.isHideScreenOnBackgroundEnabled as jest.Mock).mockResolvedValue(value);
+    (Device.isHideScreenOnBackgroundEnabled as Mock).mockResolvedValue(value);
     const wrapper = await mountView();
     const item = wrapper.findComponent('[data-testid="privacy-screen"]');
     const note = item.findComponent('ion-note');
@@ -120,7 +123,7 @@ describe('DeviceInfoPage.vue', () => {
   });
 
   it.each([[true], [false]])('locked out displays %s', async (value: boolean) => {
-    (Device.isLockedOutOfBiometrics as jest.Mock).mockResolvedValue(value);
+    (Device.isLockedOutOfBiometrics as Mock).mockResolvedValue(value);
     const wrapper = await mountView();
     const item = wrapper.findComponent('[data-testid="locked-out"]');
     const note = item.findComponent('ion-note');
@@ -130,40 +133,38 @@ describe('DeviceInfoPage.vue', () => {
   describe('toggle privacy screen button', () => {
     describe('on web', () => {
       beforeEach(() => {
-        (isPlatform as jest.Mock).mockReturnValue(false);
+        (isPlatform as Mock).mockReturnValue(false);
       });
 
       it('is disabled', async () => {
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="toggle-privacy-screen-button"]');
-        await flushPromises();
         await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(true));
       });
     });
 
     describe('on mobile', () => {
       beforeEach(() => {
-        (isPlatform as jest.Mock).mockReturnValue(true);
+        (isPlatform as Mock).mockReturnValue(true);
       });
 
       it('is enabled', async () => {
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="toggle-privacy-screen-button"]');
-        await flushPromises();
         await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(false));
       });
 
       it('toggles the privacy screen', async () => {
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="toggle-privacy-screen-button"]');
-        (Device.isHideScreenOnBackgroundEnabled as jest.Mock).mockClear();
-        (Device.isHideScreenOnBackgroundEnabled as jest.Mock).mockResolvedValue(true);
+        (Device.isHideScreenOnBackgroundEnabled as Mock).mockClear();
+        (Device.isHideScreenOnBackgroundEnabled as Mock).mockResolvedValue(true);
         await button.trigger('click');
         expect(Device.setHideScreenOnBackground).toHaveBeenCalledTimes(1);
         expect(Device.setHideScreenOnBackground).toHaveBeenCalledWith(true);
         expect(Device.isHideScreenOnBackgroundEnabled).toHaveReturnedTimes(1);
         await flushPromises();
-        (Device.setHideScreenOnBackground as jest.Mock).mockClear();
+        (Device.setHideScreenOnBackground as Mock).mockClear();
         await button.trigger('click');
         expect(Device.setHideScreenOnBackground).toHaveBeenCalledTimes(1);
         expect(Device.setHideScreenOnBackground).toHaveBeenCalledWith(false);
@@ -174,28 +175,26 @@ describe('DeviceInfoPage.vue', () => {
   describe('show biometrics prompt', () => {
     describe('on web', () => {
       beforeEach(() => {
-        (isPlatform as jest.Mock).mockReturnValue(false);
+        (isPlatform as Mock).mockReturnValue(false);
       });
 
       it('is disabled', async () => {
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="show-biometric-prompt-button"]');
-        await flushPromises();
         await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(true));
       });
     });
 
     describe('on mobile', () => {
-      const alert = { present: jest.fn().mockResolvedValue(undefined) };
+      const alert = { present: vi.fn().mockResolvedValue(undefined) };
       beforeEach(() => {
-        (isPlatform as jest.Mock).mockReturnValue(true);
-        (alertController.create as jest.Mock).mockResolvedValueOnce(alert);
+        (isPlatform as Mock).mockReturnValue(true);
+        (alertController.create as Mock).mockResolvedValueOnce(alert);
       });
 
       it('is enabled', async () => {
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="show-biometric-prompt-button"]');
-        await flushPromises();
         await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(false));
       });
 
@@ -226,7 +225,7 @@ describe('DeviceInfoPage.vue', () => {
 
       describe('on failure', () => {
         beforeEach(() => {
-          (Device.showBiometricPrompt as jest.Mock).mockRejectedValue(new Error('Cancel the thing!'));
+          (Device.showBiometricPrompt as Mock).mockRejectedValue(new Error('Cancel the thing!'));
         });
 
         it('shows a failure alert', async () => {
@@ -255,7 +254,7 @@ describe('DeviceInfoPage.vue', () => {
     });
 
     it('shows all of the defined hardware if it exists', async () => {
-      (Device.getAvailableHardware as jest.Mock).mockResolvedValue([
+      (Device.getAvailableHardware as Mock).mockResolvedValue([
         SupportedBiometricType.Fingerprint,
         SupportedBiometricType.Face,
       ]);

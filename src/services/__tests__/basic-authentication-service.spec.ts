@@ -2,16 +2,17 @@ import { User } from '@/models';
 import { useBackendAPI } from '@/composables/backend-api';
 import { useSessionVault } from '@/composables/session-vault';
 import { BasicAuthenticationService } from '@/services';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/backend-api');
-jest.mock('@/composables/session-vault');
-jest.mock('@/composables/vault-factory');
+vi.mock('@/composables/backend-api');
+vi.mock('@/composables/session-vault');
+vi.mock('@/composables/vault-factory');
 
 describe('Basic Authentication Service', () => {
   let authService: BasicAuthenticationService;
   beforeEach(() => {
     authService = new BasicAuthenticationService();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('login', () => {
@@ -86,13 +87,13 @@ describe('Basic Authentication Service', () => {
   describe('get access token', () => {
     it('resolves the token if it exists', async () => {
       const { getValue } = useSessionVault();
-      (getValue as jest.Mock).mockResolvedValue('88fueesli32s');
+      (getValue as Mock).mockResolvedValue('88fueesli32s');
       expect(await authService.getAccessToken()).toEqual('88fueesli32s');
     });
 
     it('resolves undefined if the token does not exist', async () => {
       const { getValue } = useSessionVault();
-      (getValue as jest.Mock).mockResolvedValue(undefined);
+      (getValue as Mock).mockResolvedValue(undefined);
       expect(await authService.getAccessToken()).toBeUndefined();
     });
   });
@@ -100,13 +101,13 @@ describe('Basic Authentication Service', () => {
   describe('is authenticated', () => {
     it('resolves true if the token exists', async () => {
       const { getValue } = useSessionVault();
-      (getValue as jest.Mock).mockResolvedValue('88fueesli32s');
+      (getValue as Mock).mockResolvedValue('88fueesli32s');
       expect(await authService.isAuthenticated()).toEqual(true);
     });
 
     it('resolves false if the token does not exist', async () => {
       const { getValue } = useSessionVault();
-      (getValue as jest.Mock).mockResolvedValue(undefined);
+      (getValue as Mock).mockResolvedValue(undefined);
       expect(await authService.isAuthenticated()).toEqual(false);
     });
   });

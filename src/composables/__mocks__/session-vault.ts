@@ -1,12 +1,14 @@
-export const useSessionVault = jest.fn().mockReturnValue({
-  canUnlock: jest.fn().mockResolvedValue(false),
-  initializeUnlockMode: jest.fn().mockResolvedValue(undefined),
-  setUnlockMode: jest.fn().mockResolvedValue(undefined),
-  getConfig: jest.fn().mockReturnValue({}),
-  getKeys: jest.fn().mockResolvedValue([]),
-  getValue: jest.fn().mockResolvedValue({ value: null }),
-  setValue: jest.fn().mockResolvedValue(undefined),
-  clear: jest.fn().mockResolvedValue(undefined),
-  lock: jest.fn().mockResolvedValue(undefined),
-  unlock: jest.fn().mockResolvedValue(undefined),
+import { vi } from 'vitest';
+
+export const useSessionVault = vi.fn().mockReturnValue({
+  canUnlock: vi.fn().mockResolvedValue(false),
+  initializeUnlockMode: vi.fn().mockResolvedValue(undefined),
+  setUnlockMode: vi.fn().mockResolvedValue(undefined),
+  getConfig: vi.fn().mockReturnValue({}),
+  getKeys: vi.fn().mockResolvedValue([]),
+  getValue: vi.fn().mockResolvedValue({ value: null }),
+  setValue: vi.fn().mockResolvedValue(undefined),
+  clear: vi.fn().mockResolvedValue(undefined),
+  lock: vi.fn().mockResolvedValue(undefined),
+  unlock: vi.fn().mockResolvedValue(undefined),
 });

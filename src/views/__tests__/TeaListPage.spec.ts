@@ -3,8 +3,9 @@ import TeaListPage from '@/views/TeaListPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { useTea } from '@/composables/tea';
 import { Router } from 'vue-router';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-jest.mock('@/composables/tea');
+vi.mock('@/composables/tea');
 
 describe('TeaListPage.vue', () => {
   let router: Router;
@@ -90,7 +91,7 @@ describe('TeaListPage.vue', () => {
         rating: 3,
       },
     ];
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('displays the title', async () => {

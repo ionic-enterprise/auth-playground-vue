@@ -2,8 +2,10 @@ import { useBackendAPI } from '@/composables/backend-api';
 import { useTea } from '@/composables/tea';
 import { Tea } from '@/models';
 import { GetOptions, Preferences } from '@capacitor/preferences';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@/composables/backend-api');
+vi.mock('@capacitor/preferences');
+vi.mock('@/composables/backend-api');
 
 describe('useTea', () => {
   let expectedTeas: Array<Tea>;
@@ -78,9 +80,9 @@ describe('useTea', () => {
   beforeEach(() => {
     const { client } = useBackendAPI();
     initializeTestData();
-    jest.clearAllMocks();
-    (client.get as any).mockResolvedValue({ data: httpResultTeas });
-    (Preferences.get as any).mockImplementation(async (opt: GetOptions) => {
+    vi.clearAllMocks();
+    (client.get as Mock).mockResolvedValue({ data: httpResultTeas });
+    (Preferences.get as Mock).mockImplementation(async (opt: GetOptions) => {
       let value = null;
       switch (opt.key) {
         case 'rating3':
@@ -135,7 +137,7 @@ describe('useTea', () => {
     it('finds the tea from the existing teas', async () => {
       const { client } = useBackendAPI();
       await refresh();
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       const t = await find(4);
       expect(t).toEqual({
         id: 4,

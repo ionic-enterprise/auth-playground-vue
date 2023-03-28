@@ -2,14 +2,15 @@ import { AuthProvider } from '@/models';
 import { OIDCAuthenticationService } from '@/services';
 import { Auth0Provider, AuthConnect, AzureProvider, CognitoProvider, ProviderOptions } from '@ionic-enterprise/auth';
 import { useSessionVault } from '@/composables/session-vault';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-jest.mock('@ionic-enterprise/auth');
-jest.mock('@ionic/vue', () => {
-  const actual = jest.requireActual('@ionic/vue');
-  return { ...actual, isPlatform: jest.fn().mockReturnValue(true) };
+vi.mock('@ionic-enterprise/auth');
+vi.mock('@ionic/vue', async () => {
+  const actual = (await vi.importActual('@ionic/vue')) as any;
+  return { ...actual, isPlatform: vi.fn().mockReturnValue(true) };
 });
-jest.mock('@/composables/session-vault');
-jest.mock('@/composables/vault-factory');
+vi.mock('@/composables/session-vault');
+vi.mock('@/composables/vault-factory');
 
 describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', (authProvider: string) => {
   let authService: OIDCAuthenticationService;
@@ -57,7 +58,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     authService = new OIDCAuthenticationService();
     authService.setAuthProvider(authProvider as AuthProvider);
     if (authProvider === 'Auth0') {
@@ -101,7 +102,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
     it('saves the auth result', async () => {
       const { setValue } = useSessionVault();
-      (AuthConnect.login as jest.Mock).mockResolvedValue(testAuthResult);
+      (AuthConnect.login as Mock).mockResolvedValue(testAuthResult);
       await authService.login();
       expect(setValue).toHaveBeenCalledTimes(1);
       expect(setValue).toHaveBeenCalledWith('auth-result', testAuthResult);
@@ -112,7 +113,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is no auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
-        (getValue as jest.Mock).mockResolvedValue(undefined);
+        (getValue as Mock).mockResolvedValue(undefined);
       });
 
       it('does not check for an expired access token', async () => {
@@ -128,12 +129,12 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is an auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
-        (getValue as jest.Mock).mockResolvedValue(testAuthResult);
+        (getValue as Mock).mockResolvedValue(testAuthResult);
       });
 
       describe('if the access token is not expired', () => {
         beforeEach(() => {
-          (AuthConnect.isAccessTokenExpired as jest.Mock).mockResolvedValue(false);
+          (AuthConnect.isAccessTokenExpired as Mock).mockResolvedValue(false);
         });
 
         it('resolves the access token', async () => {
@@ -143,12 +144,12 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
       describe('if the access token is expired', () => {
         beforeEach(() => {
-          (AuthConnect.isAccessTokenExpired as jest.Mock).mockResolvedValue(true);
+          (AuthConnect.isAccessTokenExpired as Mock).mockResolvedValue(true);
         });
 
         describe('if a refresh token exists', () => {
           beforeEach(() => {
-            (AuthConnect.isRefreshTokenAvailable as jest.Mock).mockResolvedValue(true);
+            (AuthConnect.isRefreshTokenAvailable as Mock).mockResolvedValue(true);
           });
 
           it('attempts a refresh', async () => {
@@ -159,7 +160,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
           describe('when the refresh is successful', () => {
             beforeEach(() => {
-              (AuthConnect.refreshSession as jest.Mock).mockResolvedValue(refreshedAuthResult);
+              (AuthConnect.refreshSession as Mock).mockResolvedValue(refreshedAuthResult);
             });
 
             it('saves the new auth result', async () => {
@@ -176,7 +177,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
           describe('when the refresh fails', () => {
             beforeEach(() => {
-              (AuthConnect.refreshSession as jest.Mock).mockRejectedValue(new Error('refresh failed'));
+              (AuthConnect.refreshSession as Mock).mockRejectedValue(new Error('refresh failed'));
             });
 
             it('clears the vault', async () => {
@@ -193,7 +194,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
         describe('if a refresh token does not exist', () => {
           beforeEach(() => {
-            (AuthConnect.isRefreshTokenAvailable as jest.Mock).mockResolvedValue(false);
+            (AuthConnect.isRefreshTokenAvailable as Mock).mockResolvedValue(false);
           });
 
           it('it does not attempt a refresh', async () => {
@@ -219,7 +220,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is no auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
-        (getValue as jest.Mock).mockResolvedValue(undefined);
+        (getValue as Mock).mockResolvedValue(undefined);
       });
 
       it('does not check for an expired access token', async () => {
@@ -235,12 +236,12 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is an auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
-        (getValue as jest.Mock).mockResolvedValue(testAuthResult);
+        (getValue as Mock).mockResolvedValue(testAuthResult);
       });
 
       describe('if the access token is not expired', () => {
         beforeEach(() => {
-          (AuthConnect.isAccessTokenExpired as jest.Mock).mockResolvedValue(false);
+          (AuthConnect.isAccessTokenExpired as Mock).mockResolvedValue(false);
         });
 
         it('resolves true', async () => {
@@ -250,12 +251,12 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
       describe('if the access token is expired', () => {
         beforeEach(() => {
-          (AuthConnect.isAccessTokenExpired as jest.Mock).mockResolvedValue(true);
+          (AuthConnect.isAccessTokenExpired as Mock).mockResolvedValue(true);
         });
 
         describe('if a refresh token exists', () => {
           beforeEach(() => {
-            (AuthConnect.isRefreshTokenAvailable as jest.Mock).mockResolvedValue(true);
+            (AuthConnect.isRefreshTokenAvailable as Mock).mockResolvedValue(true);
           });
 
           it('attempts a refresh', async () => {
@@ -266,7 +267,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
           describe('when the refresh is successful', () => {
             beforeEach(() => {
-              (AuthConnect.refreshSession as jest.Mock).mockResolvedValue(refreshedAuthResult);
+              (AuthConnect.refreshSession as Mock).mockResolvedValue(refreshedAuthResult);
             });
 
             it('saves the new auth result', async () => {
@@ -283,7 +284,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
           describe('when the refresh fails', () => {
             beforeEach(() => {
-              (AuthConnect.refreshSession as jest.Mock).mockRejectedValue(new Error('refresh failed'));
+              (AuthConnect.refreshSession as Mock).mockRejectedValue(new Error('refresh failed'));
             });
 
             it('clears the vault', async () => {
@@ -300,7 +301,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
 
         describe('if a refresh token does not exist', () => {
           beforeEach(() => {
-            (AuthConnect.isRefreshTokenAvailable as jest.Mock).mockResolvedValue(false);
+            (AuthConnect.isRefreshTokenAvailable as Mock).mockResolvedValue(false);
           });
 
           it('it does not attempt a refresh', async () => {
@@ -333,7 +334,7 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is no auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
-        (getValue as jest.Mock).mockResolvedValue(undefined);
+        (getValue as Mock).mockResolvedValue(undefined);
       });
 
       it('does not call logout ', async () => {
@@ -345,8 +346,8 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is an auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
-        (AuthConnect.isAccessTokenExpired as jest.Mock).mockResolvedValue(false);
-        (getValue as jest.Mock).mockResolvedValue(testAuthResult);
+        (AuthConnect.isAccessTokenExpired as Mock).mockResolvedValue(false);
+        (getValue as Mock).mockResolvedValue(testAuthResult);
       });
 
       it('calls logout ', async () => {

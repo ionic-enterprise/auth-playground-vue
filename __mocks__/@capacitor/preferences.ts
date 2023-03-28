@@ -1,6 +1,8 @@
+import { vi } from 'vitest';
+
 export const Preferences = {
-  get: jest.fn().mockResolvedValue({ value: undefined }),
-  set: jest.fn().mockResolvedValue(undefined),
-  remove: jest.fn().mockResolvedValue(undefined),
-  clear: jest.fn().mockResolvedValue(undefined),
+  get: vi.fn().mockResolvedValue({ value: undefined }),
+  set: vi.fn().mockResolvedValue(undefined),
+  remove: vi.fn().mockResolvedValue(undefined),
+  clear: vi.fn().mockResolvedValue(undefined),
 };
