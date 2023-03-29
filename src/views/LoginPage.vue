@@ -52,7 +52,7 @@
           <div class="auth-button-area">
             <div>--OR--</div>
             <ion-button expand="block" color="auth0" @click="signIn('Auth0')" data-testid="auth0-signin-button">
-              <ion-icon slot="end" src="assets/auth0-logo.svg"></ion-icon>
+              <ion-icon slot="end" src="/auth0-logo.svg"></ion-icon>
               Sign In with Auth0
             </ion-button>
           </div>

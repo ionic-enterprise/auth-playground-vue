@@ -19,7 +19,7 @@ const transform = async (data: RawData): Promise<Tea> => {
   return {
     ...data,
     rating: parseInt(value || '0', 10),
-    image: `assets/img/${images[data.id - 1]}.jpg`,
+    image: `img/${images[data.id - 1]}.jpg`,
   };
 };
 
