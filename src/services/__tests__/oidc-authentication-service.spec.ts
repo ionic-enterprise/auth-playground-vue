@@ -33,16 +33,16 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     audience: 'https://io.ionic.demo.ac',
     clientId: 'yLasZNUGkZ19DGEjTmAITBfGXzqbvd00',
     discoveryUrl: 'https://dev-2uspt-sz.us.auth0.com/.well-known/openid-configuration',
-    logoutUrl: 'msauth://login',
-    redirectUri: 'msauth://login',
+    logoutUrl: 'msauth://auth-action-complete',
+    redirectUri: 'msauth://auth-action-complete',
     scope: 'openid email picture profile offline_access',
   };
 
   const cognitoOptions: ProviderOptions = {
     clientId: '64p9c53l5thd5dikra675suvq9',
     discoveryUrl: 'https://cognito-idp.us-east-2.amazonaws.com/us-east-2_YU8VQe29z/.well-known/openid-configuration',
-    logoutUrl: 'msauth://login',
-    redirectUri: 'msauth://login',
+    logoutUrl: 'msauth://auth-action-complete',
+    redirectUri: 'msauth://auth-action-complete',
     scope: 'openid email profile',
     audience: '',
   };

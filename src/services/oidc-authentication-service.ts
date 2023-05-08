@@ -18,16 +18,16 @@ const auth0Options: ProviderOptions = {
   audience: 'https://io.ionic.demo.ac',
   clientId: 'yLasZNUGkZ19DGEjTmAITBfGXzqbvd00',
   discoveryUrl: 'https://dev-2uspt-sz.us.auth0.com/.well-known/openid-configuration',
-  logoutUrl: isMobile ? 'msauth://login' : 'http://localhost:8100/login',
-  redirectUri: isMobile ? 'msauth://login' : 'http://localhost:8100/login',
+  logoutUrl: isMobile ? 'msauth://auth-action-complete' : 'http://localhost:8100/auth-action-complete',
+  redirectUri: isMobile ? 'msauth://auth-action-complete' : 'http://localhost:8100/auth-action-complete',
   scope: 'openid email picture profile offline_access',
 };
 
 const cognitoOptions: ProviderOptions = {
   clientId: '64p9c53l5thd5dikra675suvq9',
   discoveryUrl: 'https://cognito-idp.us-east-2.amazonaws.com/us-east-2_YU8VQe29z/.well-known/openid-configuration',
-  logoutUrl: isMobile ? 'msauth://login' : 'http://localhost:8100/login',
-  redirectUri: isMobile ? 'msauth://login' : 'http://localhost:8100/login',
+  logoutUrl: isMobile ? 'msauth://auth-action-complete' : 'http://localhost:8100/auth-action-complete',
+  redirectUri: isMobile ? 'msauth://auth-action-complete' : 'http://localhost:8100/auth-action-complete',
   scope: 'openid email profile',
   audience: '',
 };
@@ -40,8 +40,10 @@ const azureOptions: ProviderOptions = {
     'https://dtjacdemo.b2clogin.com/dtjacdemo.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_acdemo2',
   redirectUri: isMobile
     ? 'msauth://com.ionic.acprovider/O5m5Gtd2Xt8UNkW3wk7DWyKGfv8%3D'
-    : 'http://localhost:8100/login',
-  logoutUrl: isMobile ? 'msauth://com.ionic.acprovider/O5m5Gtd2Xt8UNkW3wk7DWyKGfv8%3D' : 'http://localhost:8100/login',
+    : 'http://localhost:8100/auth-action-complete',
+  logoutUrl: isMobile
+    ? 'msauth://com.ionic.acprovider/O5m5Gtd2Xt8UNkW3wk7DWyKGfv8%3D'
+    : 'http://localhost:8100/auth-action-complete',
   audience: '',
 };
 

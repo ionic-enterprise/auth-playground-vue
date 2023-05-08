@@ -24,6 +24,10 @@ const routes: Array<RouteRecordRaw> = [
     component: StartPage,
   },
   {
+    path: '/auth-action-complete',
+    component: () => import('@/views/AuthActionCompletePage.vue'),
+  },
+  {
     path: '/login',
     component: () => import('@/views/LoginPage.vue'),
   },
