@@ -30,14 +30,14 @@
     "@ionic/vue": "~7.0.0-beta.1",
     "@ionic/vue-router": "~7.0.0-beta.1",
     "axios": "~1.4.0",
-    "vee-validate": "~4.8.4",
+    "vee-validate": "~4.9.1",
     "vue": "^3.2.21",
     "vue-router": "^4.0.12",
     "yup": "~1.1.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^4.0.1",
-    "@ionic/prettier-config": "~2.1.2",
+    "@ionic/prettier-config": "~3.0.0",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitest/coverage-c8": "~0.31.0",
     "@vue/eslint-config-typescript": "^11.0.2",
