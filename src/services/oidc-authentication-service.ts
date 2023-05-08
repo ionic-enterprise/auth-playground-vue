@@ -33,13 +33,16 @@ const cognitoOptions: ProviderOptions = {
 };
 
 const azureOptions: ProviderOptions = {
-  clientId: 'b69e2ee7-b67a-4e26-8a38-f7ca30d2e4d4',
-  scope: 'openid offline_access email profile https://vikingsquad.onmicrosoft.com/api/Hello.Read',
+  clientId: 'ed8cb65d-7bb2-4107-bc36-557fb680b994',
+  scope:
+    'openid offline_access email profile https://dtjacdemo.onmicrosoft.com/ed8cb65d-7bb2-4107-bc36-557fb680b994/demo.read',
   discoveryUrl:
-    'https://vikingsquad.b2clogin.com/vikingsquad.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_Signup_Signin',
-  redirectUri: isMobile ? 'myapp://callback' : 'http://localhost:8100/login',
-  logoutUrl: isMobile ? 'myapp://callback?logout=true' : 'http://localhost:8100/login',
-  audience: 'https://api.myapp.com',
+    'https://dtjacdemo.b2clogin.com/dtjacdemo.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_acdemo2',
+  redirectUri: isMobile
+    ? 'msauth://com.ionic.acprovider/O5m5Gtd2Xt8UNkW3wk7DWyKGfv8%3D'
+    : 'http://localhost:8100/login',
+  logoutUrl: isMobile ? 'msauth://com.ionic.acprovider/O5m5Gtd2Xt8UNkW3wk7DWyKGfv8%3D' : 'http://localhost:8100/login',
+  audience: '',
 };
 
 export class OIDCAuthenticationService implements Authenticator {
