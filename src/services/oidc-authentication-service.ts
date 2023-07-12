@@ -13,6 +13,11 @@ import { useSessionVault } from '@/composables/session-vault';
 
 const isMobile = isPlatform('hybrid');
 
+// NOTE: All of our auth providers are configured to use basically the same redirectUri and logoutUrl.
+//       For mobile, these URIs all use the msauth scheme. This is to be consistent with the Azure AD
+//       requirements. For production applications that are not using Azure, it is recommended to use
+//       a scheme that is unique to your application. For example, if your app is named "acprovider",
+//       you could use "com.yourcompany.acprovider://auth-action-complete" as your redirectUri and logoutUrl.
 const auth0Options: ProviderOptions = {
   // audience value is required for auth0's config. If it doesn't exist, the jwt payload will be empty
   audience: 'https://io.ionic.demo.ac',
