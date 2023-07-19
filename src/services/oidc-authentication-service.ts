@@ -13,8 +13,8 @@ import { useSessionVault } from '@/composables/session-vault';
 
 const isMobile = isPlatform('hybrid');
 
-// NOTE: All of our auth providers are configured to use basically the same redirectUri and logoutUrl.
-//       For mobile, these URIs all use the msauth scheme. This is to be consistent with the Azure AD
+// NOTE: All of our auth providers are configured to use almost identical values for redirectUri and logoutUrl.
+//       For mobile, these URIs all use the msauth scheme. This is done to be consistent with the Azure AD
 //       requirements. For production applications that are not using Azure, it is recommended to use
 //       a scheme that is unique to your application. For example, if your app is named "acprovider",
 //       you could use "com.yourcompany.acprovider://auth-action-complete" as your redirectUri and logoutUrl.
