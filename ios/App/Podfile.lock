@@ -14,7 +14,7 @@ PODS:
     - Capacitor
   - CordovaPlugins (5.2.3):
     - CapacitorCordova
-  - IonicEnterpriseAuth (5.0.5):
+  - IonicEnterpriseAuth (5.0.6):
     - Capacitor
 
 DEPENDENCIES:
@@ -57,7 +57,7 @@ SPEC CHECKSUMS:
   CapacitorPreferences: f03954bcb0ff09c792909e46bff88e3183c16b10
   CapacitorStatusBar: 565c0a1ebd79bb40d797606a8992b4a105885309
   CordovaPlugins: d4671f1d2a1af985cd35caa0d8bbb58b95ef3c70
-  IonicEnterpriseAuth: 01465f851b36920dd5e2495073a0bdbaf2918505
+  IonicEnterpriseAuth: abe061e4250c948500ac9ca18847ceaa7cafcfd3
 
 PODFILE CHECKSUM: b0c7b71d560ec79b897d829c5364f2b2c041d75a
 

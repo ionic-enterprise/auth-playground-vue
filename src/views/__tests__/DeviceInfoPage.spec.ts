@@ -92,7 +92,7 @@ describe('DeviceInfoPage.vue', () => {
       const item = wrapper.findComponent('[data-testid="biometrics-allowed"]');
       const note = item.findComponent('ion-note');
       expect(note.text()).toEqual(value.toString());
-    }
+    },
   );
 
   it.each([[BiometricSecurityStrength.Weak], [BiometricSecurityStrength.Strong]])(
@@ -103,7 +103,7 @@ describe('DeviceInfoPage.vue', () => {
       const item = wrapper.findComponent('[data-testid="biometric-security-strength"]');
       const note = item.findComponent('ion-note');
       expect(note.text()).toEqual(value.toString());
-    }
+    },
   );
 
   it.each([[true], [false]])('system passcode displays %s', async (value: boolean) => {
@@ -189,6 +189,8 @@ describe('DeviceInfoPage.vue', () => {
       const alert = { present: vi.fn().mockResolvedValue(undefined) };
       beforeEach(() => {
         (isPlatform as Mock).mockReturnValue(true);
+        (Device.isBiometricsAllowed as Mock).mockResolvedValue(BiometricPermissionState.Granted);
+        (Device.isBiometricsEnabled as Mock).mockResolvedValue(true);
         (alertController.create as Mock).mockResolvedValueOnce(alert);
       });
 
@@ -196,6 +198,27 @@ describe('DeviceInfoPage.vue', () => {
         const wrapper = await mountView();
         const button = wrapper.findComponent('[data-testid="show-biometric-prompt-button"]');
         await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(false));
+      });
+
+      it('is disabled if biometrics is not enabled', async () => {
+        (Device.isBiometricsEnabled as Mock).mockResolvedValue(false);
+        const wrapper = await mountView();
+        const button = wrapper.findComponent('[data-testid="show-biometric-prompt-button"]');
+        await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(true));
+      });
+
+      it('is disabled if biometrics permissions still need to be dealt with', async () => {
+        (Device.isBiometricsAllowed as Mock).mockResolvedValue(BiometricPermissionState.Prompt);
+        const wrapper = await mountView();
+        const button = wrapper.findComponent('[data-testid="show-biometric-prompt-button"]');
+        await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(true));
+      });
+
+      it('is disabled if biometrics is not allowed', async () => {
+        (Device.isBiometricsAllowed as Mock).mockResolvedValue(BiometricPermissionState.Denied);
+        const wrapper = await mountView();
+        const button = wrapper.findComponent('[data-testid="show-biometric-prompt-button"]');
+        await waitForExpect(() => expect((button.element as HTMLIonButtonElement).disabled).toBe(true));
       });
 
       it('shows the biometric prompt', async () => {

@@ -81,7 +81,9 @@
             <ion-button
               data-testid="show-biometric-prompt-button"
               expand="block"
-              :disabled="!isNativePlatform"
+              :disabled="
+                !(isNativePlatform && biometricsEnabled && biometricsAllowed === BiometricPermissionState.Granted)
+              "
               @click="showBiometricPrompt"
               >Show Biometric Prompt</ion-button
             >
