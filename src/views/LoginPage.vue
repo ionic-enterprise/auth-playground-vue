@@ -103,7 +103,7 @@ import {
 import { logoAmazon, logoMicrosoft } from 'ionicons/icons';
 import { useForm, useField } from 'vee-validate';
 import { object as yupObject, string as yupString } from 'yup';
-import { AuthProvider } from '@/models';
+import { AuthVendor } from '@/models';
 import { useAuth } from '@/composables/auth';
 import { useSessionVault } from '@/composables/session-vault';
 
@@ -122,9 +122,9 @@ const { login } = useAuth();
 const { initializeUnlockMode } = useSessionVault();
 const router = useRouter();
 
-const signIn = async (provider: AuthProvider): Promise<void> => {
+const signIn = async (vendor: AuthVendor): Promise<void> => {
   try {
-    await (provider === 'Basic' ? login(provider, email.value, password.value) : login(provider));
+    await (vendor === 'Basic' ? login(vendor, email.value, password.value) : login(vendor));
     await initializeUnlockMode();
     router.replace('/');
   } catch (err) {

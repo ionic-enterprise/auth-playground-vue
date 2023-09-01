@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/models';
+import { AuthVendor } from '@/models';
 import {
   Auth0Provider,
   AuthConnect,
@@ -62,8 +62,8 @@ export class OIDCAuthenticationService implements Authenticator {
     this.initialize();
   }
 
-  setAuthProvider(authProvider: AuthProvider): void {
-    switch (authProvider) {
+  setAuthProvider(vendor: AuthVendor): void {
+    switch (vendor) {
       case 'Auth0':
         this.provider = new Auth0Provider();
         this.options = auth0Options;
@@ -80,7 +80,7 @@ export class OIDCAuthenticationService implements Authenticator {
         break;
 
       default:
-        console.error('Invalid auth provider: ' + authProvider);
+        console.error('Invalid auth vendor: ' + vendor);
         break;
     }
   }

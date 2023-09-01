@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/models';
+import { AuthVendor } from '@/models';
 import { OIDCAuthenticationService } from '@/services';
 import { Auth0Provider, AuthConnect, AzureProvider, CognitoProvider, ProviderOptions } from '@ionic-enterprise/auth';
 import { useSessionVault } from '@/composables/session-vault';
@@ -12,7 +12,7 @@ vi.mock('@ionic/vue', async () => {
 vi.mock('@/composables/session-vault');
 vi.mock('@/composables/vault-factory');
 
-describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', (authProvider: string) => {
+describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', (vendor: string) => {
   let authService: OIDCAuthenticationService;
   let expectedOptions: ProviderOptions;
   let expectedProviderType: typeof Auth0Provider | typeof AzureProvider | typeof CognitoProvider;
@@ -61,11 +61,11 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
   beforeEach(() => {
     vi.clearAllMocks();
     authService = new OIDCAuthenticationService();
-    authService.setAuthProvider(authProvider as AuthProvider);
-    if (authProvider === 'Auth0') {
+    authService.setAuthProvider(vendor as AuthVendor);
+    if (vendor === 'Auth0') {
       expectedOptions = auth0Options;
       expectedProviderType = Auth0Provider;
-    } else if (authProvider === 'AWS') {
+    } else if (vendor === 'AWS') {
       expectedOptions = cognitoOptions;
       expectedProviderType = CognitoProvider;
     } else {

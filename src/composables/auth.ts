@@ -1,14 +1,14 @@
 import { Authenticator, BasicAuthenticationService, OIDCAuthenticationService } from '@/services';
-import { AuthProvider } from '@/models';
+import { AuthVendor } from '@/models';
 import { Preferences } from '@capacitor/preferences';
 
 let authService: Authenticator | undefined;
 let oidcAuthService: OIDCAuthenticationService | undefined;
 let basicAuthService: BasicAuthenticationService | undefined;
-const key = 'AuthProvider';
+const key = 'AuthVendor';
 
-const setupAuthService = (provider: AuthProvider): void => {
-  switch (provider) {
+const setupAuthService = (vendor: AuthVendor): void => {
+  switch (vendor) {
     case 'Basic':
       if (!basicAuthService) {
         basicAuthService = new BasicAuthenticationService();
@@ -22,12 +22,12 @@ const setupAuthService = (provider: AuthProvider): void => {
       if (!oidcAuthService) {
         oidcAuthService = new OIDCAuthenticationService();
       }
-      oidcAuthService.setAuthProvider(provider);
+      oidcAuthService.setAuthProvider(vendor);
       authService = oidcAuthService;
       break;
 
     default:
-      console.error('Invalid auth provider: ' + provider);
+      console.error('Invalid auth provider: ' + vendor);
       break;
   }
 };
@@ -36,12 +36,12 @@ const initializeAuthService = async (): Promise<void> => {
   if (!authService) {
     const { value } = await Preferences.get({ key });
     if (value) {
-      setupAuthService(value as AuthProvider);
+      setupAuthService(value as AuthVendor);
     }
   }
 };
 
-const login = async (provider: AuthProvider, username?: string, password?: string): Promise<void> => {
+const login = async (provider: AuthVendor, username?: string, password?: string): Promise<void> => {
   setupAuthService(provider);
   await Preferences.set({ key, value: provider });
   await (provider === 'Basic' ? authService?.login(username, password) : authService?.login());

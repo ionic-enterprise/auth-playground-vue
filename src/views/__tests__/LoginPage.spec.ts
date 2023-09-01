@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import waitForExpect from 'wait-for-expect';
 import { useAuth } from '@/composables/auth';
 import { useSessionVault } from '@/composables/session-vault';
-import { AuthProvider } from '@/models/AuthProvider';
+import { AuthVendor } from '@/models/AuthVendor';
 import { Router } from 'vue-router';
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
@@ -163,12 +163,12 @@ describe('LoginPage.vue', () => {
     });
   });
 
-  describe.each([['Auth0' as AuthProvider], ['AWS' as AuthProvider], ['Azure' as AuthProvider]])(
+  describe.each([['Auth0' as AuthVendor], ['AWS' as AuthVendor], ['Azure' as AuthVendor]])(
     '%s Login button',
-    (provider: AuthProvider) => {
+    (vendor: AuthVendor) => {
       let wrapper: VueWrapper<any>;
       const getButton = () => {
-        switch (provider) {
+        switch (vendor) {
           case 'AWS':
             return wrapper.find('[data-testid="aws-signin-button"]');
           case 'Auth0':
@@ -176,7 +176,7 @@ describe('LoginPage.vue', () => {
           case 'Azure':
             return wrapper.find('[data-testid="azure-signin-button"]');
           default:
-            throw new Error(`Invalid provider: ${provider}`);
+            throw new Error(`Invalid vendor: ${vendor}`);
         }
       };
 
@@ -192,7 +192,7 @@ describe('LoginPage.vue', () => {
         button.trigger('click');
         await flushPromises();
         expect(login).toHaveBeenCalledTimes(1);
-        expect(login).toHaveBeenCalledWith(provider);
+        expect(login).toHaveBeenCalledWith(vendor);
       });
 
       describe('if the login succeeds', () => {
@@ -236,6 +236,6 @@ describe('LoginPage.vue', () => {
           expect(router.replace).not.toHaveBeenCalled();
         });
       });
-    }
+    },
   );
 });
