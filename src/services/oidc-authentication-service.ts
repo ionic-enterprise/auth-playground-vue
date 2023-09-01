@@ -120,7 +120,9 @@ export class OIDCAuthenticationService implements Authenticator {
       return;
     }
     await this.initialize();
-    const authResult = await this.getAuthResult();
+    const authResult =
+      (await this.getAuthResult()) ||
+      (await AuthConnect.buildAuthResult(this.provider, this.options as ProviderOptions, {}));
     if (authResult) {
       const { clear } = useSessionVault();
       await AuthConnect.logout(this.provider, authResult);

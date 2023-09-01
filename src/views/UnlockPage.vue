@@ -35,9 +35,10 @@ import { useSessionVault } from '@/composables/session-vault';
 
 const router = useRouter();
 const { logout } = useAuth();
-const { canUnlock, unlock } = useSessionVault();
+const { canUnlock, clear, unlock } = useSessionVault();
 
 const redoClicked = async (): Promise<void> => {
+  await clear();
   await logout();
   await router.replace('/login');
 };
@@ -75,6 +76,7 @@ const unlockClicked = async (): Promise<void> => {
     margin-right: 5%;
   }
 }
+
 @media (min-width: 576px) {
   ion-card {
     margin-top: 20%;
@@ -82,6 +84,7 @@ const unlockClicked = async (): Promise<void> => {
     margin-right: 10%;
   }
 }
+
 @media (min-width: 768px) {
   ion-card {
     margin-top: 10%;
@@ -89,6 +92,7 @@ const unlockClicked = async (): Promise<void> => {
     margin-right: 20%;
   }
 }
+
 @media (min-width: 992px) {
   ion-card {
     margin-top: 10%;
@@ -96,6 +100,7 @@ const unlockClicked = async (): Promise<void> => {
     margin-right: 25%;
   }
 }
+
 @media (min-width: 1200px) {
   ion-card {
     margin-top: 10%;

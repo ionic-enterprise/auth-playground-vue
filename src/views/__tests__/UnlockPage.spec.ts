@@ -107,19 +107,28 @@ describe('UnlockPage.vue', () => {
   });
 
   describe('the redo button', () => {
+    it('clears the vault', async () => {
+      const { clear } = useSessionVault();
+      const wrapper = await mountView();
+      const button = wrapper.find('[data-testid="redo-button"]');
+      await button.trigger('click');
+      expect(clear).toHaveBeenCalledOnce();
+    });
+
     it('performs a logout', async () => {
       const { logout } = useAuth();
       const wrapper = await mountView();
       const button = wrapper.find('[data-testid="redo-button"]');
       await button.trigger('click');
-      expect(logout).toHaveBeenCalledTimes(1);
+      expect(logout).toHaveBeenCalledOnce();
     });
 
     it('navigates to the login page', async () => {
       const wrapper = await mountView();
       const button = wrapper.find('[data-testid="redo-button"]');
       await button.trigger('click');
-      expect(router.replace).toHaveBeenCalledTimes(1);
+      await flushPromises();
+      expect(router.replace).toHaveBeenCalledOnce();
       expect(router.replace).toHaveBeenCalledWith('/login');
     });
   });

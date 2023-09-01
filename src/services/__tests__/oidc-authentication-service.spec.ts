@@ -29,6 +29,12 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     idToken: 'test-id-token',
   };
 
+  const builtAuthResult = {
+    accessToken: 'built-access-token',
+    refreshToken: 'built-refresh-token',
+    idToken: 'built-id-token',
+  };
+
   const auth0Options: ProviderOptions = {
     audience: 'https://io.ionic.demo.ac',
     clientId: 'yLasZNUGkZ19DGEjTmAITBfGXzqbvd00',
@@ -335,12 +341,26 @@ describe.each([['Auth0'], ['AWS'], ['Azure']])('Authentication Service for %s', 
     describe('if there is no auth result', () => {
       beforeEach(() => {
         const { getValue } = useSessionVault();
+        (AuthConnect.buildAuthResult as Mock).mockResolvedValue(builtAuthResult);
         (getValue as Mock).mockResolvedValue(undefined);
       });
 
-      it('does not call logout ', async () => {
+      it('builds an auth result', async () => {
         await authService.logout();
-        expect(AuthConnect.logout).not.toHaveBeenCalled();
+        expect(AuthConnect.buildAuthResult).toHaveBeenCalledOnce();
+        expect(AuthConnect.buildAuthResult).toHaveBeenCalledWith(expect.any(expectedProviderType), expectedOptions, {});
+      });
+
+      it('calls logout with the built auth result', async () => {
+        await authService.logout();
+        expect(AuthConnect.logout).toHaveBeenCalledOnce();
+        expect(AuthConnect.logout).toHaveBeenCalledWith(expect.any(expectedProviderType), builtAuthResult);
+      });
+
+      it('clears the auth result', async () => {
+        const { clear } = useSessionVault();
+        await authService.logout();
+        expect(clear).toHaveBeenCalledTimes(1);
       });
     });
 
