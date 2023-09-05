@@ -45,6 +45,7 @@ import {
   IonRow,
   IonTitle,
   IonToolbar,
+  onIonViewDidEnter,
 } from '@ionic/vue';
 import { useTea } from '@/composables/tea';
 import { Tea } from '@/models';
@@ -68,7 +69,7 @@ const teaRows = computed(() => {
   return teaMatrix;
 });
 
-refresh();
+onIonViewDidEnter(refresh);
 </script>
 
 <style scoped>

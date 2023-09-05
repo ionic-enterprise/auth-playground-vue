@@ -1,15 +1,21 @@
-import { mount, VueWrapper } from '@vue/test-utils';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import TeaListPage from '@/views/TeaListPage.vue';
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { useTea } from '@/composables/tea';
 import { Router } from 'vue-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { IonApp, IonRouterOutlet } from '@ionic/vue';
 
 vi.mock('@/composables/tea');
 
 describe('TeaListPage.vue', () => {
   let router: Router;
   const { teas } = useTea();
+
+  const App = {
+    components: { IonApp, IonRouterOutlet },
+    template: '<ion-app><ion-router-outlet /></ion-app>',
+  };
 
   const mountView = async (): Promise<VueWrapper<any>> => {
     router = createRouter({
@@ -18,7 +24,7 @@ describe('TeaListPage.vue', () => {
     });
     router.push('/');
     await router.isReady();
-    return mount(TeaListPage, {
+    return mount(App, {
       global: {
         plugins: [router],
       },
