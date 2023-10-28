@@ -1,5 +1,7 @@
 # Vue Auth Playground
 
+**note:** this repo has been archived. please see the [Vue Tutorials and Demos Repo](https://github.com/ionic-enterprise/tutorials-and-demos-vue).
+
 This application highlights the use of the Ionic Enterprise <a href="https://ionic.io/docs/auth-connect" target="_blank">Auth Connect</a> and <a href="https://ionic.io/docs/identity-vault/" target="_blank">Identity Vault</a> products in an Vue application. The application runs on both Android and iOS. In addition, it supports running in the web, allowing developers to remain in a more comfortable and productive web-based development environments while working on the application. Since the web does not have a secure biometrically locked key storage mechanism, however, the full potential of Identity Vault is only accessible through the native platforms.
 
 This application uses <a href="https://capacitorjs.com/docs" target="_blank">Capacitor</a> to provide the native layer. This is the preferred technology to use for the native layer and the Customer Success team highly suggests using it over Cordova. However, Identity Vault and Auth Connect can both be used with either technology.
